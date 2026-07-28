@@ -72,17 +72,27 @@ app; changes always apply (fixed build path — no need to delete `build/`).
 
 ## Tests
 
-There's no XCTest target. Two standalone harnesses:
+There's no XCTest target. Three standalone harnesses, each compiling the **real** engine sources:
 
 ```sh
-swift Tools/fuzz-test.swift                                        # launcher fuzzy matcher
+swiftc Tinycast/Core/FuzzyMatch.swift Tools/fuzz-test.swift \
+    -o /tmp/fuzz-test && /tmp/fuzz-test                            # launcher fuzzy matcher
+
 swiftc Tinycast/Core/Calculator/*.swift Tools/calc-test.swift \
-    -o /tmp/calc-test && /tmp/calc-test                           # calculator engine
+    -o /tmp/calc-test && /tmp/calc-test                            # calculator engine
+
+swiftc Tinycast/Core/FuzzyMatch.swift Tinycast/Core/Emoji/*.swift Tools/emoji-test.swift \
+    -o /tmp/emoji-test && /tmp/emoji-test                          # emoji catalog + grid geometry
 ```
 
-`Tools/fuzz-test.swift` holds a **copy** of `FuzzyMatch` from `Tinycast/Core/AppIndex.swift` —
-change the scoring in one and mirror it in the other. The calc harness compiles the real engine
-sources, which is why `Tinycast/Core/Calculator/` must stay Foundation-only.
+Each harness links the shipping source rather than a copy, which is why
+`Tinycast/Core/Calculator/`, `Tinycast/Core/Emoji/` and `Tinycast/Core/FuzzyMatch.swift` must all
+stay Foundation-only. Don't paste an engine into `Tools/` to make a harness build — a copy silently
+stops testing the real code. The emoji harness pulls in `FuzzyMatch` because `EmojiIndex` searches
+with it.
+
+`.github/workflows/ci.yml` runs the Debug build and all three harnesses on every push and pull
+request, and is the source of truth for these commands.
 
 ## Generated data
 

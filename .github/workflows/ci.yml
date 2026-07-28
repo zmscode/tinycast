@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to a PR cancels the previous run — only the tip needs to be green.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v7
+
+      # Same selection logic as release.yml: the project targets macOS 26 and needs the Xcode 26 toolchain.
+      - name: Select Xcode 26
+        run: |
+          XCODE_PATH="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -n1)"
+          if [ -z "$XCODE_PATH" ]; then
+            echo "::error::No Xcode 26.x found on this runner. Installed Xcodes:"
+            ls /Applications | grep -i xcode || true
+            exit 1
+          fi
+          echo "Using $XCODE_PATH"
+          echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> "$GITHUB_ENV"
+
+      # Tinycast.xcodeproj is generated from project.yml but committed. If a PR edits project.yml
+      # without regenerating, the committed project is stale and the release build uses the wrong
+      # settings — catch that here rather than at release time.
+      - name: Verify Tinycast.xcodeproj is in sync with project.yml
+        run: |
+          brew install xcodegen
+          xcodegen generate
+          if ! git diff --quiet -- Tinycast.xcodeproj; then
+            echo "::error::Tinycast.xcodeproj is out of sync with project.yml. Run 'xcodegen generate' and commit the result."
+            git diff --stat -- Tinycast.xcodeproj
+            exit 1
+          fi
+
+      # Signing is deliberately off: project.yml pins CODE_SIGN_IDENTITY to "Tinycast Self-Signed",
+      # a local-only identity the runner doesn't have. Release signing is release.yml's job.
+      - name: Build (Debug)
+        run: |
+          set -o pipefail
+          xcodebuild -project Tinycast.xcodeproj -scheme Tinycast -configuration Debug \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+
+      # Each harness compiles the real engine sources, so these also assert those stay Foundation-only.
+      - name: Test — launcher fuzzy matcher
+        run: |
+          swiftc Tinycast/Core/FuzzyMatch.swift Tools/fuzz-test.swift -o "$RUNNER_TEMP/fuzz-test"
+          "$RUNNER_TEMP/fuzz-test"
+
+      - name: Test — calculator engine
+        run: |
+          swiftc Tinycast/Core/Calculator/*.swift Tools/calc-test.swift -o "$RUNNER_TEMP/calc-test"
+          "$RUNNER_TEMP/calc-test"
+
+      - name: Test — emoji catalog
+        run: |
+          swiftc Tinycast/Core/FuzzyMatch.swift Tinycast/Core/Emoji/*.swift Tools/emoji-test.swift \
+            -o "$RUNNER_TEMP/emoji-test"
+          "$RUNNER_TEMP/emoji-test"
