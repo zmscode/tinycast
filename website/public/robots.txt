@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://abue-ammar.github.io/tinycast/sitemap.xml
