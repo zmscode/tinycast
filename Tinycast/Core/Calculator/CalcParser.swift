@@ -19,6 +19,23 @@ enum CalcTokenizer {
 
 		func isDigit(_ ch: Character) -> Bool { ch.isASCII && ch.isNumber }
 
+		/// The `e[+-]?digits` tail of a scientific literal, or nil when the `e` is Euler's constant.
+		/// `1e3` → 1000, but `2e` stays 2 × e and `3 exabytes` keeps its unit.
+		func scanExponent(_ chars: [Character], from start: Int) -> (text: String, next: Int)? {
+			var j = start + 1
+			var text = "e"
+			if j < chars.count, chars[j] == "+" || chars[j] == "-" {
+				text.append(chars[j])
+				j += 1
+			}
+			guard j < chars.count, isDigit(chars[j]) else { return nil }
+			while j < chars.count, isDigit(chars[j]) {
+				text.append(chars[j])
+				j += 1
+			}
+			return (text, j)
+		}
+
 		while i < chars.count {
 			let ch = chars[i]
 			if ch.isWhitespace {
@@ -52,6 +69,12 @@ enum CalcTokenizer {
 					} else if c == "." && !seenDot {
 						seenDot = true
 						text.append(c)
+					} else if (c == "e" || c == "E"), !text.isEmpty,
+						let exponent = scanExponent(chars, from: i)
+					{
+						text += exponent.text
+						i = exponent.next
+						break
 					} else {
 						break
 					}
@@ -173,6 +196,9 @@ private struct Parser {
 		switch current {
 		case .op(let op) where op == "+" || op == "-": return (op, 10, 11)
 		case .op(let op) where op == "*" || op == "/": return (op, 20, 21)
+		// Modulo needs a word, since a bare `%` is the percent postfix. `%` is free as its operator
+		// character precisely because percent is handled in parsePostfix, never here.
+		case .ident("mod"): return ("%", 20, 21)
 		case .ident("of"): return ("*", 20, 21)
 		case .op("^"): return ("^", 30, 30)  // right-associative: 2^3^2 = 512
 		default: return nil
@@ -193,6 +219,7 @@ private struct Parser {
 				? lhs.effective * (1 - rhs.value / 100) : lhs.effective - rhs.effective
 		case "*": result = lhs.effective * rhs.effective
 		case "/": result = lhs.effective / rhs.effective
+		case "%": result = lhs.effective.truncatingRemainder(dividingBy: rhs.effective)
 		case "^": result = pow(lhs.effective, rhs.effective)
 		default: return nil
 		}

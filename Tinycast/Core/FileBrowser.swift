@@ -8,8 +8,12 @@ struct FileEntry: Identifiable, Hashable, Sendable {
 
 	var id: String { path }
 
-	/// Trailing slash marks a folder in the grid caption, the same shorthand a shell uses.
-	var displayName: String { isDirectory ? name + "/" : name }
+	/// Grid caption: the icon already says "folder" and "which kind of file", so the slash and the
+	/// extension are redundant chrome. `deletingPathExtension` leaves dotfiles alone (`.gitignore`
+	/// stays whole) and strips only the last component (`archive.tar.gz` → `archive.tar`).
+	var displayName: String {
+		isDirectory ? name : (name as NSString).deletingPathExtension
+	}
 }
 
 /// Resolves a typed path into a directory listing. Foundation-only and free of AppKit so
