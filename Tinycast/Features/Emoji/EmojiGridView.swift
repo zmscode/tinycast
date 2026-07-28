@@ -266,18 +266,19 @@ enum EmojiActionsMenu {
 			header: entry.displayName,
 			items: [
 				PopoverMenuItem(
-					title: target?.pasteTitle ?? "Paste",
+					title: target?.pasteTitle ?? String(localized: "Paste"),
 					icon: .paste(target, fallback: "doc.on.clipboard"), shortcut: "↵"
 				) {
 					core.pasteEmoji(entry)
 				},
 				PopoverMenuItem(
-					title: "Copy to Clipboard", systemImage: "doc.on.doc", shortcut: "⌘↵"
+					title: String(localized: "Copy to Clipboard"), systemImage: "doc.on.doc",
+					shortcut: "⌘↵"
 				) {
 					core.copyEmoji(entry)
 				},
 				PopoverMenuItem(
-					title: "Paste & Keep Window Open", icon: .paste(target, fallback: "pin")
+					title: String(localized: "Paste & Keep Window Open"), icon: .paste(target, fallback: "pin")
 				) {
 					core.pasteEmojiKeepingWindowOpen(entry)
 				},

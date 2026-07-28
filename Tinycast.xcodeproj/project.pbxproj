@@ -79,6 +79,7 @@
 		E952B659AEB905A3B233F78B /* EmojiGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB94F0767AE0A5855FB22BF6 /* EmojiGridView.swift */; };
 		F25D58ED6EF3308D38D01732 /* PaletteWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5447AEAD87BFE0E2D979B39 /* PaletteWindowController.swift */; };
 		F2B68DBA258D85DD5C6DC1CC /* Paster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6185011A02366B30B48B5B6C /* Paster.swift */; };
+		F5EEA88C9F6BBC94539173D3 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1EE2F7E7C7F2A97594835F82 /* Localizable.xcstrings */; };
 		F5F3381FF70997223F8888B0 /* KeyShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3EB07C07902C53BFD3B08B /* KeyShortcut.swift */; };
 		F6B79728FF2D37A60FED72AF /* HyperKeyTap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919AC64DE9C9DC3A973A0B4E /* HyperKeyTap.swift */; };
 		FE6A9C75F87C3495F413E66E /* CalculatorHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68BD5E61831CB92150C62E1F /* CalculatorHistoryView.swift */; };
@@ -93,6 +94,7 @@
 		0F50886DC766B9923C3875A5 /* RootPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPaletteView.swift; sourceTree = "<group>"; };
 		1BCCED95A78DC5BED117E960 /* RaycastImportSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaycastImportSelection.swift; sourceTree = "<group>"; };
 		1DB0D6E17E2B2D6F2CB47E0D /* HotKeyCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyCenter.swift; sourceTree = "<group>"; };
+		1EE2F7E7C7F2A97594835F82 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		23591B301A183579098AA019 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		25B8A7D8DBB0CE2ACEDB3979 /* CalcUnits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalcUnits.swift; sourceTree = "<group>"; };
 		297F819E291F33E43E490359 /* MiscellaneousSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiscellaneousSettingsView.swift; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 				95CA98985928A88B33F82556 /* Features */,
 				C45190564C9D9F1722E83943 /* Assets.xcassets */,
 				4DA7B926405DAC632C056418 /* Info.plist */,
+				1EE2F7E7C7F2A97594835F82 /* Localizable.xcstrings */,
 				45D4BA6E1BD8EB1F96A8927F /* Tinycast.entitlements */,
 				6621A88681E993D49EEF07A3 /* tinycast.icon */,
 			);
@@ -442,6 +445,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9969E6858C4FDC5CCCDEB5D8 /* Assets.xcassets in Resources */,
+				F5EEA88C9F6BBC94539173D3 /* Localizable.xcstrings in Resources */,
 				36784C964DB27B94A62EEAA3 /* tinycast.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -622,6 +626,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -630,6 +635,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
@@ -688,6 +694,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -697,6 +704,7 @@
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_SWIFT_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;

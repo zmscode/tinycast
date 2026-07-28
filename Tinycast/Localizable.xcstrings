@@ -1,0 +1,1084 @@
+{
+	"sourceLanguage": "en",
+	"strings": {
+		"%@ equals %@": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "%@ equals %@"
+					}
+				}
+			}
+		},
+		"%lld favorites": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "%lld favorites"
+					}
+				}
+			}
+		},
+		"%lld hidden items": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "%lld hidden items"
+					}
+				}
+			}
+		},
+		"%lld settings": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "%lld settings"
+					}
+				}
+			}
+		},
+		"%lld shortcuts": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "%lld shortcuts"
+					}
+				}
+			}
+		},
+		"A tiny, native macOS launcher.": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "A tiny, native macOS launcher."
+					}
+				}
+			}
+		},
+		"About Tinycast": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "About Tinycast"
+					}
+				}
+			}
+		},
+		"Actions": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Actions"
+					}
+				}
+			}
+		},
+		"Application": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Application"
+					}
+				}
+			}
+		},
+		"Applications": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Applications"
+					}
+				}
+			}
+		},
+		"Applications with unsaved changes will ask you to save.": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Applications with unsaved changes will ask you to save."
+					}
+				}
+			}
+		},
+		"Applied %@.": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Applied %@."
+					}
+				}
+			}
+		},
+		"Apps": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Apps"
+					}
+				}
+			}
+		},
+		"Back": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Back"
+					}
+				}
+			}
+		},
+		"Calculator History": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Calculator History"
+					}
+				}
+			}
+		},
+		"Cancel": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Cancel"
+					}
+				}
+			}
+		},
+		"Category": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Category"
+					}
+				}
+			}
+		},
+		"Choose…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Choose…"
+					}
+				}
+			}
+		},
+		"Clear History": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Clear History"
+					}
+				}
+			}
+		},
+		"Clear clipboard history?": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Clear clipboard history?"
+					}
+				}
+			}
+		},
+		"Clear…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Clear…"
+					}
+				}
+			}
+		},
+		"Clipboard": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Clipboard"
+					}
+				}
+			}
+		},
+		"Clipboard History": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Clipboard History"
+					}
+				}
+			}
+		},
+		"Clipboard changes from these apps won't be recorded.": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Clipboard changes from these apps won't be recorded."
+					}
+				}
+			}
+		},
+		"Command": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Command"
+					}
+				}
+			}
+		},
+		"Commands": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Commands"
+					}
+				}
+			}
+		},
+		"Copy Answer": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Copy Answer"
+					}
+				}
+			}
+		},
+		"Copy to Clipboard": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Copy to Clipboard"
+					}
+				}
+			}
+		},
+		"Delete All Entries": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Delete All Entries"
+					}
+				}
+			}
+		},
+		"Delete Entry": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Delete Entry"
+					}
+				}
+			}
+		},
+		"Deselect All": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Deselect All"
+					}
+				}
+			}
+		},
+		"Do math, convert units, or search your past calculations…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Do math, convert units, or search your past calculations…"
+					}
+				}
+			}
+		},
+		"Does Nothing": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Does Nothing"
+					}
+				}
+			}
+		},
+		"Earlier": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Earlier"
+					}
+				}
+			}
+		},
+		"Emoji & Symbols": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Emoji & Symbols"
+					}
+				}
+			}
+		},
+		"Enable": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Enable"
+					}
+				}
+			}
+		},
+		"Export Failed": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Export Failed"
+					}
+				}
+			}
+		},
+		"Export Settings": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Export Settings"
+					}
+				}
+			}
+		},
+		"Export…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Export…"
+					}
+				}
+			}
+		},
+		"Grant Access…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Grant Access…"
+					}
+				}
+			}
+		},
+		"Granted": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Granted"
+					}
+				}
+			}
+		},
+		"Image": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Image"
+					}
+				}
+			}
+		},
+		"Import": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Import"
+					}
+				}
+			}
+		},
+		"Import Failed": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Import Failed"
+					}
+				}
+			}
+		},
+		"Import Settings": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Import Settings"
+					}
+				}
+			}
+		},
+		"Import from Raycast": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Import from Raycast"
+					}
+				}
+			}
+		},
+		"Importing…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Importing…"
+					}
+				}
+			}
+		},
+		"Import…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Import…"
+					}
+				}
+			}
+		},
+		"Information": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Information"
+					}
+				}
+			}
+		},
+		"No matches for “%@”.": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "No matches for “%@”."
+					}
+				}
+			}
+		},
+		"Not Now": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Not Now"
+					}
+				}
+			}
+		},
+		"Not granted": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Not granted"
+					}
+				}
+			}
+		},
+		"Nothing here yet.": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Nothing here yet."
+					}
+				}
+			}
+		},
+		"Nothing to import from this file.": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Nothing to import from this file."
+					}
+				}
+			}
+		},
+		"Open %@": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Open %@"
+					}
+				}
+			}
+		},
+		"Open Settings…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Open Settings…"
+					}
+				}
+			}
+		},
+		"Open…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Open…"
+					}
+				}
+			}
+		},
+		"Passphrase": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Passphrase"
+					}
+				}
+			}
+		},
+		"Paste": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Paste"
+					}
+				}
+			}
+		},
+		"Paste & Keep Window Open": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Paste & Keep Window Open"
+					}
+				}
+			}
+		},
+		"Paste to %@": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Paste to %@"
+					}
+				}
+			}
+		},
+		"Quit %@": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Quit %@"
+					}
+				}
+			}
+		},
+		"Quit %lld applications?": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Quit %lld applications?"
+					}
+				}
+			}
+		},
+		"Quit 1 application?": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Quit 1 application?"
+					}
+				}
+			}
+		},
+		"Quit All": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Quit All"
+					}
+				}
+			}
+		},
+		"Quit All Applications": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Quit All Applications"
+					}
+				}
+			}
+		},
+		"Quit Raycast": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Quit Raycast"
+					}
+				}
+			}
+		},
+		"Quit Tinycast": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Quit Tinycast"
+					}
+				}
+			}
+		},
+		"Record Shortcut": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Record Shortcut"
+					}
+				}
+			}
+		},
+		"Search Emoji & Symbols": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Search Emoji & Symbols"
+					}
+				}
+			}
+		},
+		"Search apps…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Search apps…"
+					}
+				}
+			}
+		},
+		"Search emoji and symbols…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Search emoji and symbols…"
+					}
+				}
+			}
+		},
+		"Search for apps and commands…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Search for apps and commands…"
+					}
+				}
+			}
+		},
+		"Select All": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Select All"
+					}
+				}
+			}
+		},
+		"Settings": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Settings"
+					}
+				}
+			}
+		},
+		"Settings Imported": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Settings Imported"
+					}
+				}
+			}
+		},
+		"Settings...": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Settings..."
+					}
+				}
+			}
+		},
+		"Show in Finder": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Show in Finder"
+					}
+				}
+			}
+		},
+		"Show in launcher": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Show in launcher"
+					}
+				}
+			}
+		},
+		"Show…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Show…"
+					}
+				}
+			}
+		},
+		"Skip": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Skip"
+					}
+				}
+			}
+		},
+		"System Setting": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "System Setting"
+					}
+				}
+			}
+		},
+		"System Settings": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "System Settings"
+					}
+				}
+			}
+		},
+		"This Month": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "This Month"
+					}
+				}
+			}
+		},
+		"This Week": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "This Week"
+					}
+				}
+			}
+		},
+		"This can't be undone.": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "This can't be undone."
+					}
+				}
+			}
+		},
+		"Today": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Today"
+					}
+				}
+			}
+		},
+		"Trigger Escape": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Trigger Escape"
+					}
+				}
+			}
+		},
+		"Turn on currency conversion?": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Turn on currency conversion?"
+					}
+				}
+			}
+		},
+		"Type shortcut…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Type shortcut…"
+					}
+				}
+			}
+		},
+		"Type to filter entries…": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Type to filter entries…"
+					}
+				}
+			}
+		},
+		"Update Now": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Update Now"
+					}
+				}
+			}
+		},
+		"Used by %@": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Used by %@"
+					}
+				}
+			}
+		},
+		"Yesterday": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "Yesterday"
+					}
+				}
+			}
+		},
+		"copied from %@": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "copied from %@"
+					}
+				}
+			}
+		},
+		"running": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "running"
+					}
+				}
+			}
+		},
+		"shortcut %@": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "shortcut %@"
+					}
+				}
+			}
+		},
+		"© 2026 Abue Ammar · Released under AGPL-3.0": {
+			"extractionState": "extracted_with_value",
+			"localizations": {
+				"en": {
+					"stringUnit": {
+						"state": "translated",
+						"value": "© 2026 Abue Ammar · Released under AGPL-3.0"
+					}
+				}
+			}
+		}
+	},
+	"version": "1.0"
+}

@@ -84,11 +84,11 @@ enum DateBucket: Int {
 
 	var title: String {
 		switch self {
-		case .today: return "Today"
-		case .yesterday: return "Yesterday"
-		case .thisWeek: return "This Week"
-		case .thisMonth: return "This Month"
-		case .earlier: return "Earlier"
+		case .today: return String(localized: "Today")
+		case .yesterday: return String(localized: "Yesterday")
+		case .thisWeek: return String(localized: "This Week")
+		case .thisMonth: return String(localized: "This Month")
+		case .earlier: return String(localized: "Earlier")
 		}
 	}
 
@@ -115,33 +115,37 @@ enum ClipboardActionsMenu {
 	) -> PopoverMenuContent {
 		var items: [PopoverMenuItem] = [
 			PopoverMenuItem(
-				title: target?.pasteTitle ?? "Paste",
+				title: target?.pasteTitle ?? String(localized: "Paste"),
 				icon: .paste(target, fallback: "doc.on.clipboard"), shortcut: "↵"
 			) {
 				core.paste(item)
 			},
-			PopoverMenuItem(title: "Copy to Clipboard", systemImage: "doc.on.doc", shortcut: "⌘↵") {
+			PopoverMenuItem(
+				title: String(localized: "Copy to Clipboard"), systemImage: "doc.on.doc",
+				shortcut: "⌘↵") {
 				core.copyToClipboard(item)
 			},
 			PopoverMenuItem(
-				title: "Paste & Keep Window Open", icon: .paste(target, fallback: "pin")
+				title: String(localized: "Paste & Keep Window Open"), icon: .paste(target, fallback: "pin")
 			) {
 				core.pasteKeepingWindowOpen(item)
 			},
 		]
 		if item.kind == .image {
 			items.append(
-				PopoverMenuItem(title: "Show in Finder", systemImage: "folder") {
+				PopoverMenuItem(title: String(localized: "Show in Finder"), systemImage: "folder") {
 					core.revealClipboardImage(item)
 				})
 		}
 		items.append(
-			PopoverMenuItem(title: "Delete Entry", systemImage: "trash", isDestructive: true) {
+			PopoverMenuItem(
+					title: String(localized: "Delete Entry"), systemImage: "trash", isDestructive: true) {
 				store.remove(item)
 			})
 		items.append(
 			PopoverMenuItem(
-				title: "Delete All Entries", systemImage: "trash.fill", isDestructive: true
+				title: String(localized: "Delete All Entries"), systemImage: "trash.fill",
+					isDestructive: true
 			) {
 				store.clearAll()
 			})
@@ -155,7 +159,7 @@ enum ClipboardActionsMenu {
 			let oneLine = (item.text ?? "").split(whereSeparator: \.isWhitespace).joined(
 				separator: " ")
 			return String(oneLine.prefix(40))
-		case .image: return "Image"
+		case .image: return String(localized: "Image")
 		}
 	}
 }
@@ -199,12 +203,13 @@ private struct ClipboardRow: View {
 		var parts: [String] = []
 		switch item.kind {
 		case .text: parts.append(previewText)
-		case .image: parts.append("Image")
+		case .image: parts.append(String(localized: "Image"))
 		}
 		if let bundleID = item.sourceBundleID,
 			let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
 		{
-			parts.append("copied from \(url.deletingPathExtension().lastPathComponent)")
+			parts.append(
+				String(localized: "copied from \(url.deletingPathExtension().lastPathComponent)"))
 		}
 		return parts.joined(separator: ", ")
 	}
@@ -215,7 +220,7 @@ private struct ClipboardRow: View {
 		case .text:
 			return String((item.text ?? "").prefix(200)).trimmingCharacters(
 				in: .whitespacesAndNewlines)
-		case .image: return "Image"
+		case .image: return String(localized: "Image")
 		}
 	}
 

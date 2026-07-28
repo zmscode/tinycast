@@ -93,6 +93,13 @@ Never break these without an explicit task to do so.
 - **Clipboard writes stamp a private `internalType` marker** so the poller skips Tinycast's own writes.
 - **Hotkeys persist under legacy `KeyboardShortcuts_<name>` UserDefaults keys** (from the removed
   KeyboardShortcuts package) so old bindings survive. See [hotkeys.md](docs/hotkeys.md).
+- **User-facing text is localized.** `Tinycast/Localizable.xcstrings` is the String Catalog;
+  `SWIFT_EMIT_LOC_STRINGS` extracts at build time. SwiftUI `Text("…")`/`Button("…")`/`.help("…")`
+  take `LocalizedStringKey` and are picked up automatically — a plain `String` is not, so model
+  properties and AppKit strings (`NSAlert.messageText`, `addButton(withTitle:)`, `PopoverMenuItem`
+  titles) must use `String(localized:)`. Never wrap an SF Symbol name, bundle id or pasteboard type
+  — those are API identifiers, not text. `Core/Calculator/` and `Core/Emoji/` stay unlocalized so
+  they remain Foundation-only and pure for their harnesses.
 - **Read [`docs/ui.md`](docs/ui.md) before any restyle or new view.** `Core/Theme.swift` is the single
   design-token source.
 

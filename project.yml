@@ -11,6 +11,10 @@ settings:
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
     SWIFT_VERSION: "6.0"
+    # Extract localizable strings into Tinycast/Localizable.xcstrings at build time, so a new
+    # Text("…") or String(localized:) lands in the catalog without anyone maintaining it by hand.
+    SWIFT_EMIT_LOC_STRINGS: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Manual
     # Stable self-signed identity so macOS keeps the Accessibility grant across rebuilds.

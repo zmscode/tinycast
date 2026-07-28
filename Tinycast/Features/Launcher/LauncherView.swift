@@ -193,8 +193,8 @@ private struct AppRow: View {
 	/// Name, then the facts a sighted user reads from chrome: running dot, bound hotkey, kind.
 	private var accessibilityLabel: String {
 		var parts = [app.name]
-		if running { parts.append("running") }
-		if let caps = shortcutCaps { parts.append("shortcut \(caps.joined(separator: " "))") }
+		if running { parts.append(String(localized: "running")) }
+		if let caps = shortcutCaps { parts.append(String(localized: "shortcut \(caps.joined(separator: " "))")) }
 		parts.append(app.kindLabel)
 		return parts.joined(separator: ", ")
 	}
