@@ -83,7 +83,8 @@ struct CalculatorCard: View {
 
 	private var accessibilityLabel: String {
 		switch result.payload {
-		case .value(let display, _): return "\(result.expression) equals \(display)"
+		case .value(let display, _):
+			return String(localized: "\(result.expression) equals \(display)")
 		case .error(let message): return message
 		}
 	}
@@ -127,7 +128,8 @@ enum CalcActionsMenu {
 		PopoverMenuContent(
 			header: result.expression,
 			items: [
-				PopoverMenuItem(title: "Copy Answer", systemImage: "doc.on.doc", shortcut: "↵") {
+				PopoverMenuItem(
+						title: String(localized: "Copy Answer"), systemImage: "doc.on.doc", shortcut: "↵") {
 					core.copyCalculatorResult(result)
 				}
 			]

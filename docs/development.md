@@ -115,6 +115,28 @@ left out and decided by hand in `CalcCurrency.contested`, the one currency table
 hand. Re-run the script when a currency is added or retired; nothing breaks in the meantime, since
 an unquoted code just reports "no exchange rate".
 
+## Localization
+
+`Tinycast/Localizable.xcstrings` is the String Catalog. `SWIFT_EMIT_LOC_STRINGS` extracts keys at
+build time, and Xcode merges them into the catalog when you build in the IDE — open the catalog in
+Xcode to add a language or fill in translations.
+
+SwiftUI takes `LocalizedStringKey`, so `Text("Apps")` is localizable with no code change. A plain
+`String` is not, so anything crossing a non-SwiftUI boundary needs `String(localized:)`:
+
+```swift
+Text("Apps")                                    // already localizable
+alert.messageText = String(localized: "Quit?")  // AppKit — needs the wrapper
+case .application: return String(localized: "Application")   // model property — needs it too
+```
+
+Don't wrap SF Symbol names, bundle ids or pasteboard types — they're API identifiers. Interpolated
+keys (`"\(count) settings"`) become `%lld` entries in the catalog, where a translator can attach
+plural rules.
+
+`Core/Calculator/` and `Core/Emoji/` are deliberately unlocalized: they must stay Foundation-only
+and pure so the harnesses can compile them.
+
 ## Packaging a DMG
 
 For a local signed DMG:

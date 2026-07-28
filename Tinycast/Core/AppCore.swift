@@ -10,10 +10,10 @@ enum PaletteMode: String, CaseIterable, Identifiable {
 	var id: String { rawValue }
 	var title: String {
 		switch self {
-		case .launcher: return "Apps"
-		case .clipboard: return "Clipboard"
-		case .calculatorHistory: return "Calculator History"
-		case .emoji: return "Emoji & Symbols"
+		case .launcher: return String(localized: "Apps")
+		case .clipboard: return String(localized: "Clipboard")
+		case .calculatorHistory: return String(localized: "Calculator History")
+		case .emoji: return String(localized: "Emoji & Symbols")
 		}
 	}
 	var systemImage: String {
@@ -26,10 +26,11 @@ enum PaletteMode: String, CaseIterable, Identifiable {
 	}
 	var placeholder: String {
 		switch self {
-		case .launcher: return "Search for apps and commands…"
-		case .clipboard: return "Type to filter entries…"
-		case .calculatorHistory: return "Do math, convert units, or search your past calculations…"
-		case .emoji: return "Search emoji and symbols…"
+		case .launcher: return String(localized: "Search for apps and commands…")
+		case .clipboard: return String(localized: "Type to filter entries…")
+		case .calculatorHistory:
+			return String(localized: "Do math, convert units, or search your past calculations…")
+		case .emoji: return String(localized: "Search emoji and symbols…")
 		}
 	}
 }
@@ -46,7 +47,7 @@ struct PasteTarget: Equatable {
 		iconPath = app.bundleURL?.path
 	}
 
-	var pasteTitle: String { "Paste to \(name)" }
+	var pasteTitle: String { String(localized: "Paste to \(name)") }
 }
 
 /// View-model shared between the panel's SwiftUI tree and the coordinator.
@@ -283,14 +284,18 @@ final class AppCore: ObservableObject {
 		// An accessory app's alert opens behind the frontmost app unless it activates first (same as `BackupActions`).
 		NSApp.activate(ignoringOtherApps: true)
 		let alert = NSAlert()
-		alert.messageText = count == 1 ? "Quit 1 application?" : "Quit \(count) applications?"
-		alert.informativeText = "Applications with unsaved changes will ask you to save."
+		alert.messageText =
+			count == 1
+			? String(localized: "Quit 1 application?")
+			: String(localized: "Quit \(count) applications?")
+		alert.informativeText = String(
+			localized: "Applications with unsaved changes will ask you to save.")
 		alert.alertStyle = .warning
-		let quitButton = alert.addButton(withTitle: "Quit All")
+		let quitButton = alert.addButton(withTitle: String(localized: "Quit All"))
 		quitButton.hasDestructiveAction = true
 		// `hasDestructiveAction` only tints the button — it stays the ↵ default. Hand ↵ to Cancel instead: this command is one ↵ away in the palette, and a second reflexive ↵ must not quit the desktop.
 		quitButton.keyEquivalent = ""
-		alert.addButton(withTitle: "Cancel").keyEquivalent = "\r"
+		alert.addButton(withTitle: String(localized: "Cancel")).keyEquivalent = "\r"
 		return alert.runModal() == .alertFirstButtonReturn
 	}
 

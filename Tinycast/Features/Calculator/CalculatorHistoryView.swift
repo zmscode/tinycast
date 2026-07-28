@@ -133,7 +133,7 @@ private struct CalcHistoryRow: View {
 		)
 		.armedHover($hovered)
 		.accessibilityElement(children: .ignore)
-		.accessibilityLabel("\(entry.expression) equals \(entry.result)")
+		.accessibilityLabel(String(localized: "\(entry.expression) equals \(entry.result)"))
 		.accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
 	}
 }
