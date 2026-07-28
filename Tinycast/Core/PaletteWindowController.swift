@@ -1,4 +1,5 @@
 import AppKit
+import QuickLookUI
 import SwiftUI
 
 @MainActor
@@ -89,13 +90,29 @@ final class PaletteWindowController: NSObject, NSWindowDelegate {
 		Paster.pasteStringInPlace(text, into: previousApp)
 	}
 
+	/// The live panel, if one has been created — read by `QuickLookController` to hand focus back.
+	var panelWindow: NSWindow? { panel }
+
 	// MARK: - NSWindowDelegate
 
 	/// Dismiss when the palette loses key status (click-away, ⌘-Tab, app switch).
+	///
+	/// Quick Look is the one exception: `QLPreviewPanel` is itself a key-taking `NSPanel`, so
+	/// previewing a file would otherwise dismiss the palette out from under it and leave the preview
+	/// orphaned. The check runs a turn later because the QL panel isn't key yet at resign time.
 	func windowDidResignKey(_ notification: Notification) {
 		guard isVisible else { return }
-		hide(restoreFocus: false)
+		DispatchQueue.main.async { [weak self] in
+			guard let self, self.isVisible, !self.panelIsKey else { return }
+			if QLPreviewPanel.sharedPreviewPanelExists(), QLPreviewPanel.shared().isVisible {
+				return
+			}
+			self.hide(restoreFocus: false)
+		}
 	}
+
+	/// True while the palette itself holds key status — it can be regained before the deferred check runs (e.g. closing Quick Look hands focus straight back).
+	private var panelIsKey: Bool { panel?.isKeyWindow == true }
 
 	/// Re-bump focusToken a turn after the panel becomes key: on the first-ever show this fires mid-mount, before the SwiftUI tree has registered its onChange, so a synchronous bump is silently lost.
 	func windowDidBecomeKey(_ notification: Notification) {

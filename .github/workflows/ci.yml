@@ -66,6 +66,12 @@ jobs:
           swiftc Tinycast/Core/Calculator/*.swift Tools/calc-test.swift -o "$RUNNER_TEMP/calc-test"
           "$RUNNER_TEMP/calc-test"
 
+      - name: Test — file grid paths
+        run: |
+          swiftc Tinycast/Core/FuzzyMatch.swift Tinycast/Core/FileBrowser.swift Tools/file-test.swift \
+            -o "$RUNNER_TEMP/file-test"
+          "$RUNNER_TEMP/file-test"
+
       - name: Test — emoji catalog
         run: |
           swiftc Tinycast/Core/FuzzyMatch.swift Tinycast/Core/Emoji/*.swift Tools/emoji-test.swift \

@@ -101,6 +101,8 @@ final class AppCore: ObservableObject {
 	let emojiIndex = EmojiIndex()
 	let frequentEmoji = FrequentEmojiStore()
 	let runningApps = RunningAppsMonitor()
+	let files = FileStore()
+	let quickLook = QuickLookController()
 	let palette = PaletteViewModel()
 
 	private lazy var windowController = PaletteWindowController(core: self)
@@ -138,6 +140,15 @@ final class AppCore: ObservableObject {
 			OnboardingState.markShown()
 			showOnboarding()
 		}
+
+		#if DEBUG
+			// Dev affordance: `TINYCAST_DEBUG_QUERY=~/Code/ ...` opens the palette pre-filled, which
+			// is how the file grid gets exercised without binding a hotkey first.
+			if let seeded = ProcessInfo.processInfo.environment["TINYCAST_DEBUG_QUERY"] {
+				showPalette(mode: .launcher)
+				palette.query = seeded
+			}
+		#endif
 	}
 
 	// MARK: - Palette control
@@ -177,8 +188,13 @@ final class AppCore: ObservableObject {
 		if palette.mode == .launcher { Task { await appIndex.refresh() } }
 	}
 
+	/// The palette panel, for the Quick Look controller to return focus to and forward keys into.
+	var paletteKeyWindow: NSWindow? { windowController.panelWindow }
+
 	func hidePalette(restoreFocus: Bool = true) {
+		quickLook.close()
 		windowController.hide(restoreFocus: restoreFocus)
+		files.invalidate()
 	}
 
 	/// True when the palette should render as the slim compact bar: compact mode on, launcher root, empty query, and not force-expanded via the "…" overflow.
@@ -350,6 +366,40 @@ final class AppCore: ObservableObject {
 	func copyHistoryExpression(_ entry: CalcHistoryEntry) {
 		hidePalette(restoreFocus: false)
 		Paster.copyPlainText(entry.expression)
+	}
+
+	// MARK: - File grid actions
+
+	func openFile(_ entry: FileEntry) {
+		hidePalette(restoreFocus: false)
+		AppLauncher.launch(URL(fileURLWithPath: entry.path))
+	}
+
+	/// Space on a file-grid tile. Folders have no useful Quick Look preview, but including them keeps
+	/// arrowing through a directory from silently doing nothing on every other tile.
+	func toggleQuickLook(entries: [FileEntry], index: Int) {
+		quickLook.toggle(urls: entries.map { URL(fileURLWithPath: $0.path) }, index: index)
+	}
+
+	func followQuickLook(entries: [FileEntry], index: Int) {
+		quickLook.follow(urls: entries.map { URL(fileURLWithPath: $0.path) }, index: index)
+	}
+
+	/// Quick Look invoked from the ⌘K menu, which closes the menu but must keep the palette up.
+	func quickLookFromMenu(_ entry: FileEntry) {
+		let entries = files.entries(for: palette.query)
+		let index = entries.firstIndex(of: entry) ?? 0
+		quickLook.show(urls: entries.map { URL(fileURLWithPath: $0.path) }, index: index)
+	}
+
+	func revealFile(_ entry: FileEntry) {
+		hidePalette(restoreFocus: false)
+		AppLauncher.showInFinder(URL(fileURLWithPath: entry.path))
+	}
+
+	func copyFilePath(_ entry: FileEntry) {
+		hidePalette(restoreFocus: false)
+		Paster.copyPlainText(entry.path)
 	}
 
 	func showInFinder(_ app: AppEntry) {
