@@ -242,12 +242,15 @@ final class AppIndex: ObservableObject {
 			guard let score = FuzzyMatch.score(query: q, candidate: app.name) else { return nil }
 			return (app, score)
 		}
+		// Length is load-bearing, not cosmetic: fzf scores the matched region and doesn't penalize
+		// trailing text, so "Safari" and "Safari Technology Preview" tie on score and only this
+		// breaks them apart. (The previous tiered scorer folded length into the score itself.)
 		return
 			scored
 			.sorted {
-				$0.1 != $1.1
-					? $0.1 > $1.1
-					: $0.0.name.localizedCaseInsensitiveCompare($1.0.name) == .orderedAscending
+				if $0.1 != $1.1 { return $0.1 > $1.1 }
+				if $0.0.name.count != $1.0.name.count { return $0.0.name.count < $1.0.name.count }
+				return $0.0.name.localizedCaseInsensitiveCompare($1.0.name) == .orderedAscending
 			}
 			.prefix(limit)
 			.map(\.0)

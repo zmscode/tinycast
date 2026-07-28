@@ -93,6 +93,13 @@ Never break these without an explicit task to do so.
 - **Clipboard writes stamp a private `internalType` marker** so the poller skips Tinycast's own writes.
 - **Hotkeys persist under legacy `KeyboardShortcuts_<name>` UserDefaults keys** (from the removed
   KeyboardShortcuts package) so old bindings survive. See [hotkeys.md](docs/hotkeys.md).
+- **The launcher matcher is a port of fzf's FuzzyMatchV2** (`Core/FuzzyMatch.swift`, MIT — see
+  `THIRD-PARTY-NOTICES.md`). Bonuses read the *original* case, so never lower-case the candidate
+  before scoring — that erases the camelCase signal. Scores cover the matched region only and do
+  **not** shrink with candidate length, so every ranking site needs a shorter-name tiebreak
+  (`AppIndex.rank`, `EmojiIndex.search`); the old tiered scorer folded length into the score itself.
+  `score` skips the backtrace matrix, `match` returns positions for highlighting — don't route
+  ranking through `match`.
 - **User-facing text is localized.** `Tinycast/Localizable.xcstrings` is the String Catalog;
   `SWIFT_EMIT_LOC_STRINGS` extracts at build time. SwiftUI `Text("…")`/`Button("…")`/`.help("…")`
   take `LocalizedStringKey` and are picked up automatically — a plain `String` is not, so model

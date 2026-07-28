@@ -115,6 +115,29 @@ left out and decided by hand in `CalcCurrency.contested`, the one currency table
 hand. Re-run the script when a currency is added or retired; nothing breaks in the meantime, since
 an unquoted code just reports "no exchange rate".
 
+## The fuzzy matcher
+
+`Tinycast/Core/FuzzyMatch.swift` is a Swift port of fzf's `FuzzyMatchV2` (MIT — full notice in
+[`THIRD-PARTY-NOTICES.md`](../THIRD-PARTY-NOTICES.md)). It is an affine-gap alignment that finds the
+*best* placement of the query rather than the first, with bonuses for word boundaries, camelCase
+humps, path delimiters and consecutive runs.
+
+Three properties that constrain callers:
+
+- **Bonuses read the original case.** Lower-casing a candidate before scoring erases the camelCase
+  signal (`rpv` → `RootPaletteView`). Only the equality test is case-folded, internally.
+- **Score does not shrink with length.** fzf scores the matched region and ignores trailing text, so
+  `Safari` and `Safari Technology Preview` tie. Every ranking site needs a shorter-name tiebreak.
+- **`score` and `match` differ in cost.** `match` allocates a backtrace matrix to return positions
+  (for highlighting); `score` skips it. Ranking sweeps thousands of candidates per keystroke — use
+  `score` there.
+
+`Tools/fuzz-test.swift` asserts *relative* orderings rather than absolute scores, so retuning a bonus
+doesn't churn the suite. Every scoring rule has at least one case that fails if the rule is deleted —
+verify with a mutation pass (zero out a bonus, confirm the suite goes red) before trusting a change.
+Gap penalties and the first-char multiplier only scale scores rather than flip orderings, so those
+are covered by margin assertions instead.
+
 ## Localization
 
 `Tinycast/Localizable.xcstrings` is the String Catalog. `SWIFT_EMIT_LOC_STRINGS` extracts keys at
