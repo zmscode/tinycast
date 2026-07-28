@@ -20,6 +20,18 @@ also **pure**: the one input it can't compute, the FX rate table, is passed in (
    `CalcUnits.parseBareConversion` + the `autoTargets` map)
 8. Plain arithmetic
 
+### Operator notes
+
+- **Scientific notation** (`1e3`, `2.5e-3`) is consumed only when a digit — optionally signed —
+  follows the `e`. A bare `e` stays Euler's constant, so `2e` is still 2 × e and `3 exabytes` keeps
+  its unit intact.
+- **Modulo is the word `mod`** (`17 mod 5`), not `%`, because a bare `%` is the percent postfix
+  (`250 + 15%`). Internally it rides on the `%` operator *character*, which is free precisely
+  because percent is handled in `parsePostfix` and never reaches `peekBinary`. Same precedence as
+  `*` and `/`.
+- A lone literal returns no card at all — `2.5e-3` on its own is more likely an app search than a
+  calculation. It needs to be part of an expression (`2.5e-3 * 1000`).
+
 Date/time depends on the clock, so it takes an injected `now` / `calendar` — the public `evaluate(_:)`
 uses the live clock, and `evaluate(_:now:calendar:)` lets `calc-test.swift` assert exact strings
 against a fixed clock.

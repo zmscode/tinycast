@@ -15,6 +15,7 @@ struct FileTests {
 		splitting()
 		expansion()
 		navigation()
+		captions()
 		spaceRule()
 		listing()
 
@@ -70,6 +71,22 @@ struct FileTests {
 		check("then one level is dropped", FileBrowser.parent(of: "~/Code/") == "~/")
 		check("root has no parent", FileBrowser.parent(of: "/") == nil)
 		check("bare home has no parent", FileBrowser.parent(of: "~") == nil)
+	}
+
+	/// Captions drop the folder slash and the file extension — the icon conveys both.
+	static func captions() {
+		func caption(_ name: String, dir: Bool) -> String {
+			FileEntry(name: name, path: "/x/" + name, isDirectory: dir).displayName
+		}
+		check("a folder shows no trailing slash", caption("Core", dir: true) == "Core")
+		check("a file drops its extension", caption("AppCore.swift", dir: false) == "AppCore")
+		check("an extensionless file is unchanged", caption("Makefile", dir: false) == "Makefile")
+		// A dotfile's leading dot is its name, not an extension.
+		check("a dotfile keeps its name", caption(".gitignore", dir: false) == ".gitignore")
+		check("a dotted dotfile drops only the last part", caption(".hidden.txt", dir: false) == ".hidden")
+		check("only the last extension goes", caption("archive.tar.gz", dir: false) == "archive.tar")
+		// A folder that looks like it has an extension keeps its whole name.
+		check("a folder with a dot keeps it", caption("Tinycast.xcodeproj", dir: true) == "Tinycast.xcodeproj")
 	}
 
 	/// Regression: Space previews only when no filter fragment is being typed.

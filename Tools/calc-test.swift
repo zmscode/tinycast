@@ -18,6 +18,21 @@ struct CalcTests {
 		expectDisplay("(5+2)*3", "21")
 		expectDisplay("5!", "120")
 		expectDisplay("3!!", "720")  // (3!)! — chained postfix
+
+		// Scientific notation. Only consumed when a digit follows, so `e` stays Euler's constant.
+		expectDisplay("1e3 + 1", "1,001")
+		expectDisplay("1e6 / 1000", "1,000")
+		expectDisplay("2.5e-3 * 1000", "2.5")
+		expectDisplay("1E3 + 0", "1,000")
+		expectNil("2e")  // 2 × Euler's e, not a truncated literal
+		expectNil("5 e")
+
+		// Modulo is a word: a bare `%` is the percent postfix.
+		expectDisplay("17 mod 5", "2")
+		expectDisplay("100 mod 7", "2")
+		expectDisplay("10 mod 3 + 1", "2")  // binds tighter than +
+		expectDisplay("2 * 7 mod 4", "2")  // same precedence as *, left to right
+		expectDisplay("250 + 15%", "287.5")  // percent postfix still intact
 		expectDisplay("-5+3", "-2")
 		expectDisplay("-2^2", "-4")  // unary minus binds looser than ^
 		expectDisplay("10/4", "2.5")
