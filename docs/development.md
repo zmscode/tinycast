@@ -72,7 +72,7 @@ app; changes always apply (fixed build path — no need to delete `build/`).
 
 ## Tests
 
-There's no XCTest target. Three standalone harnesses, each compiling the **real** engine sources:
+There's no XCTest target. Four standalone harnesses, each compiling the **real** engine sources:
 
 ```sh
 swiftc Tinycast/Core/FuzzyMatch.swift Tools/fuzz-test.swift \
@@ -83,6 +83,9 @@ swiftc Tinycast/Core/Calculator/*.swift Tools/calc-test.swift \
 
 swiftc Tinycast/Core/FuzzyMatch.swift Tinycast/Core/Emoji/*.swift Tools/emoji-test.swift \
     -o /tmp/emoji-test && /tmp/emoji-test                          # emoji catalog + grid geometry
+
+swiftc Tinycast/Core/FuzzyMatch.swift Tinycast/Core/FileBrowser.swift Tools/file-test.swift \
+    -o /tmp/file-test && /tmp/file-test                            # file-grid path handling
 ```
 
 Each harness links the shipping source rather than a copy, which is why

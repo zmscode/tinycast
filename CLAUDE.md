@@ -40,6 +40,12 @@ Full detail: [`docs/architecture.md`](docs/architecture.md).
   palette is a borderless floating `NSPanel` hosting SwiftUI; Settings/About are plain `NSWindow`s via
   `AuxWindowController`. SwiftUI `Settings` / `Window` scenes are deliberately avoided (unreliable for
   accessory apps).
+- **File grid.** A launcher query starting with `/`, `~`, `./` or `../` swaps the results area for
+  `FileGridView` — a five-column icon array — rather than adding a `PaletteMode`, which would mean
+  touching every exhaustive mode switch. `FileBrowser` (Foundation-only, harness-tested) splits the
+  query into directory + filter fragment, shell-completion style. Quick Look runs through
+  `QuickLookController`, and `PaletteWindowController` suppresses its resign-key dismissal while a
+  preview is up — `QLPreviewPanel` takes key focus and would otherwise dismiss the palette.
 - **Subsystems:** [palette](docs/palette.md) · [launcher & fuzzy match](docs/launcher.md) ·
   [calculator](docs/calculator.md) · [clipboard](docs/clipboard.md) · [emoji](docs/emoji.md) ·
   [hotkeys](docs/hotkeys.md) · [UI & design system](docs/ui.md).

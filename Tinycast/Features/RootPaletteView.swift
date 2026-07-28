@@ -62,9 +62,18 @@ struct RootPaletteView: View {
 	}
 	private var calcCount: Int { calcResult == nil ? 0 : 1 }
 
+	/// True when the launcher's query is a path, so the results area becomes the file grid.
+	private var browsingFiles: Bool {
+		vm.mode == .launcher && FileBrowser.looksLikePath(vm.query)
+	}
+	private var fileEntries: [FileEntry] {
+		guard browsingFiles else { return [] }
+		return core.files.entries(for: vm.query)
+	}
+
 	private var resultCount: Int {
 		switch vm.mode {
-		case .launcher: return appResults.count + calcCount
+		case .launcher: return browsingFiles ? fileEntries.count : appResults.count + calcCount
 		case .clipboard: return clipResults.count
 		case .calculatorHistory: return histResults.count + calcCount
 		case .emoji: return emojiResults.count
@@ -88,6 +97,10 @@ struct RootPaletteView: View {
 		}
 		return calc
 	}
+	private var selectedFileEntry: FileEntry? {
+		let entries = fileEntries
+		return entries.indices.contains(selection) ? entries[selection] : nil
+	}
 	private var selectedAppEntry: AppEntry? {
 		let index = selection - calcCount
 		return appResults.indices.contains(index) ? appResults[index] : nil
@@ -107,6 +120,9 @@ struct RootPaletteView: View {
 	private var actionsContent: PopoverMenuContent? {
 		switch vm.mode {
 		case .launcher:
+			if let file = selectedFileEntry {
+				return FileActionsMenu.content(entry: file, core: core)
+			}
 			if let calc = calcActionableResult {
 				return CalcActionsMenu.content(result: calc, core: core)
 			}
@@ -168,8 +184,13 @@ struct RootPaletteView: View {
 		// Every count/selection below derives from this one calc/offset pair — the flat selection index must always match the visible row order, calc card included.
 		let calc = calcResult
 		let offset = calc == nil ? 0 : 1
-		// Only the active mode is non-empty.
-		let count = apps.count + offset + clips.count + hist.count + emojis.count
+		// Only the active mode is non-empty. The file grid replaces the launcher's own results, so it
+		// supplies the count outright — otherwise selection clamps to 0 (no arrow keys) and the footer
+		// action group hides, since a path query matches no apps and evaluates as no calculation.
+		let files = browsingFiles ? fileEntries : []
+		let count =
+			browsingFiles
+			? files.count : apps.count + offset + clips.count + hist.count + emojis.count
 		let sel = count == 0 ? 0 : min(max(vm.selection, 0), count - 1)
 		let calcSelected = calc != nil && sel == 0
 		// An error card is selectable but has no action: it must not drive the Copy Answer pill, ⌘K menu, or Enter.
@@ -179,7 +200,9 @@ struct RootPaletteView: View {
 			showSections ? apps.prefix(while: { favorites.isFavorite($0) }).count : 0
 		let selectedApp = apps.indices.contains(sel - offset) ? apps[sel - offset] : nil
 		// Derive the footer label from the already-resolved selection so `bottomBar` doesn't re-run `appResults` (its filter/sort aren't memoized). The primary/Actions group is hidden when there's nothing to act on: no results in any mode, or an error calc card (selectable but action-less).
-		let pillLabel = actionPillLabel(selectedApp: selectedApp, calcActionable: calcActionable)
+		let selectedFile = files.indices.contains(sel) ? files[sel] : nil
+		let pillLabel = actionPillLabel(
+			selectedApp: selectedApp, calcActionable: calcActionable, selectedFile: selectedFile)
 		let showActionGroup = count > 0 && !(calcSelected && !calcActionable)
 
 		// The `header` (and its single search field) is always attached in the same position via safeAreaInset so its focus survives the compact↔expanded swap — only the results below it toggle. Collapsed shows the bar alone; expanded floats header + action bar over the list with edge-dissolve (see docs/ui.md).
@@ -300,7 +323,13 @@ struct RootPaletteView: View {
 				moveMenu(1)
 				return .handled
 			}
-			if vm.mode == .emoji { moveEmojiRow(1) } else { move(1) }
+			if vm.mode == .emoji {
+				moveEmojiRow(1)
+			} else if browsingFiles {
+				moveFileRow(1)
+			} else {
+				move(1)
+			}
 			return .handled
 		}
 		.onKeyPress(.upArrow) {
@@ -309,20 +338,49 @@ struct RootPaletteView: View {
 				moveMenu(-1)
 				return .handled
 			}
-			if vm.mode == .emoji { moveEmojiRow(-1) } else { move(-1) }
+			if vm.mode == .emoji {
+				moveEmojiRow(-1)
+			} else if browsingFiles {
+				moveFileRow(-1)
+			} else {
+				move(-1)
+			}
 			return .handled
 		}
 		// Horizontal arrows step the emoji grid; everywhere else they stay with the field editor's caret. An open menu swallows them so the list behind never moves.
 		.onKeyPress(.leftArrow) {
 			if menuOpen { return .handled }
-			guard vm.mode == .emoji else { return .ignored }
+			guard vm.mode == .emoji || browsingFiles else { return .ignored }
 			move(-1)
 			return .handled
 		}
 		.onKeyPress(.rightArrow) {
 			if menuOpen { return .handled }
-			guard vm.mode == .emoji else { return .ignored }
+			guard vm.mode == .emoji || browsingFiles else { return .ignored }
 			move(1)
+			return .handled
+		}
+		// Space previews the selected file; ⌘↑ goes up a directory. Both are file-grid only, so the
+		// space bar keeps typing normally everywhere else.
+		.onKeyPress(keys: [" "], phases: .down) { press in
+			guard browsingFiles, !menuOpen, !press.modifiers.contains(.command) else {
+				return .ignored
+			}
+			// Only when the caret is at the end of a path, so a space typed mid-filename still types.
+			guard vm.query.hasSuffix("/") || !vm.query.isEmpty else { return .ignored }
+			core.toggleQuickLook(entries: fileEntries, index: selection)
+			return .handled
+		}
+		.onKeyPress(keys: ["y"], phases: .down) { press in
+			guard browsingFiles, press.modifiers.contains(.command) else { return .ignored }
+			core.toggleQuickLook(entries: fileEntries, index: selection)
+			return .handled
+		}
+		.onKeyPress(keys: [.upArrow], phases: .down) { press in
+			guard browsingFiles, press.modifiers.contains(.command) else { return .ignored }
+			guard let up = FileBrowser.parent(of: vm.query) else { return .handled }
+			vm.query = up
+			vm.selection = 0
 			return .handled
 		}
 		// With a menu open, plain ↵ activates its highlighted row. A modified ↵ always runs the selection's own action regardless of menu state: ⌘↵ the secondary copy action (each menu advertises it), ⌥↵ paste-in-place; plain ↵ (no menu) falls through to the field's onSubmit.
@@ -465,6 +523,22 @@ struct RootPaletteView: View {
 		selection: Int, favoriteCount: Int, showSections: Bool
 	) -> some View {
 		switch vm.mode {
+		case .launcher where browsingFiles:
+			let entries = fileEntries
+			if entries.isEmpty {
+				EmptyResults(text: "Nothing here")
+			} else {
+				FileGridView(
+					entries: entries,
+					selection: selection,
+					directoryKey: FileBrowser.split(vm.query).directory,
+					onSelect: { vm.selection = $0 },
+					onActivate: activateSelection
+				)
+				// Keep an open preview in step with the selection (no-op when it's closed).
+				.onChange(of: selection) { core.followQuickLook(entries: entries, index: selection) }
+				.onChange(of: vm.query) { core.followQuickLook(entries: entries, index: selection) }
+			}
 		case .launcher:
 			let offset = calc == nil ? 0 : 1
 			let calcSelected = calc != nil && selection == 0
@@ -619,13 +693,28 @@ struct RootPaletteView: View {
 	}
 
 	/// Pill label for the current selection, derived from the selection already resolved in `body` so it never re-runs the (unmemoized) `appResults` filter/sort.
-	private func actionPillLabel(selectedApp: AppEntry?, calcActionable: Bool) -> String {
+	/// Vertical movement in the file grid steps a whole row, clamping into the last (possibly partial) row.
+	private func moveFileRow(_ delta: Int) {
+		let count = fileEntries.count
+		guard count > 0 else { return }
+		let target = selection + delta * FileGrid.columns
+		vm.selection = target < 0 || target >= count ? selection : target
+	}
+
+	private func actionPillLabel(
+		selectedApp: AppEntry?, calcActionable: Bool, selectedFile: FileEntry?
+	) -> String {
 		switch vm.mode {
 		case .clipboard, .emoji:
 			return vm.pasteTarget?.pasteTitle ?? "Paste"
 		case .calculatorHistory:
 			return "Copy Answer"
 		case .launcher:
+			if browsingFiles {
+				guard let file = selectedFile else { return String(localized: "Open") }
+				return file.isDirectory
+					? String(localized: "Open Folder") : String(localized: "Open File")
+			}
 			if calcActionable { return "Copy Answer" }
 			switch selectedApp?.kind {
 			case .systemSettings: return "Open System Setting"
@@ -730,6 +819,18 @@ struct RootPaletteView: View {
 		guard !isCollapsed else { return }
 		switch vm.mode {
 		case .launcher:
+			if browsingFiles {
+				guard let file = selectedFileEntry else { return }
+				// A folder descends in place (query becomes the new path); a file opens and dismisses.
+				if file.isDirectory {
+					vm.query = FileBrowser.descend(into: file, from: vm.query, home: core.files.home)
+					vm.selection = 0
+					scrollToken = UUID()
+				} else {
+					core.openFile(file)
+				}
+				return
+			}
 			if let calcResult, selection == 0 {
 				// Error cards no-op — copyCalculatorResult only acts on value payloads.
 				core.copyCalculatorResult(calcResult)
