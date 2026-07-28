@@ -31,7 +31,10 @@ final class EmojiIndex: ObservableObject {
 		guard !q.isEmpty else { return [] }
 		if let searchCache, searchCache.query == q { return searchCache.result }
 
-		// A keyword hit is penalized just under half a tier so an equal-quality name match always outranks it.
+		// A keyword hit is penalized so an equal-quality name match always outranks it. Sized against
+		// FuzzyMatch's scale (a matched character is worth 16), not the old tiered one where this was
+		// 500 out of ~70,000 — at that magnitude every keyword hit would now sort below every name hit.
+		let keywordPenalty = 8
 		var scored: [(entry: EmojiEntry, score: Int, order: Int)] = []
 		for (order, entry) in entries.enumerated() {
 			let nameScore = FuzzyMatch.score(query: q, candidate: entry.name)
@@ -39,12 +42,20 @@ final class EmojiIndex: ObservableObject {
 			if !entry.keywords.isEmpty,
 				let keywordScore = FuzzyMatch.score(query: q, candidate: entry.keywords)
 			{
-				best = max(best ?? Int.min, keywordScore - 500)
+				best = max(best ?? Int.min, keywordScore - keywordPenalty)
 			}
 			if let best { scored.append((entry, best, order)) }
 		}
+		// Shorter name wins a tie: fzf scores the matched region only, so "grin" and "grinning cat
+		// with smiling eyes" tie on score alone.
 		let result = scored
-			.sorted { $0.score != $1.score ? $0.score > $1.score : $0.order < $1.order }
+			.sorted {
+				if $0.score != $1.score { return $0.score > $1.score }
+				if $0.entry.name.count != $1.entry.name.count {
+					return $0.entry.name.count < $1.entry.name.count
+				}
+				return $0.order < $1.order
+			}
 			.prefix(limit)
 			.map(\.entry)
 		searchCache = (q, result)

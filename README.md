@@ -57,3 +57,6 @@ release workflows, and **[docs/ui.md](docs/ui.md)** for the UI design system.
 ## License
 
 [AGPL-3.0](LICENSE)
+
+The launcher's fuzzy matcher is a port of [fzf](https://github.com/junegunn/fzf)'s scoring algorithm
+(MIT) — see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
