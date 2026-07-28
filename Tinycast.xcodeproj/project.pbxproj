@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		05561CD36EF1A0775A282165 /* ShortcutsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF5AE919A2699E6EB8BF7DC8 /* ShortcutsSettingsView.swift */; };
 		0DD808F80666846F4E74BAD8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23591B301A183579098AA019 /* OnboardingView.swift */; };
+		109B63469DA494BD58E4538E /* FuzzyMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5227374AD8CDAE69DB46E159 /* FuzzyMatch.swift */; };
 		14712478C37E6E8760CA47EC /* HyperKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6DC5A4706854493D23FD18A /* HyperKey.swift */; };
 		14A5A5ACD35A572EE906769F /* CalcEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B976C84AFE60E357A346224 /* CalcEngine.swift */; };
 		1D0C2F452B3801503B70EA9E /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F63A3610C275E4961D60C7E /* GeneralSettingsView.swift */; };
@@ -111,6 +112,7 @@
 		4DA7B926405DAC632C056418 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4F63A3610C275E4961D60C7E /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		5043CD44B4B40C49BE79852A /* SettingsBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBackup.swift; sourceTree = "<group>"; };
+		5227374AD8CDAE69DB46E159 /* FuzzyMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzyMatch.swift; sourceTree = "<group>"; };
 		52ADC36002F1A5B04D61B4D3 /* ClipboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardView.swift; sourceTree = "<group>"; };
 		5392500F86E23C099D33561D /* Tinycast.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tinycast.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		555E9C7EA62BDB40891A5751 /* PalettePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PalettePanel.swift; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 				8E6CB5CD6C0477BAC9FE383F /* CurrencyRateStore.swift */,
 				33A13DB27EE627AC08051165 /* EdgeDissolve.swift */,
 				9FB750D045194AE34D39D792 /* FavoritesStore.swift */,
+				5227374AD8CDAE69DB46E159 /* FuzzyMatch.swift */,
 				D37B6D29E8E23C6136EBFB38 /* HotKeyManager.swift */,
 				99945F0952ADADBBEB9B8388 /* ImageThumbnail.swift */,
 				0D045D032498C2294A99890E /* LaunchAtLogin.swift */,
@@ -485,6 +488,7 @@
 				8611F52FF00B8C43EC46F902 /* EmojiSettingsView.swift in Sources */,
 				A41C0DCB2DEBCCA46F6C4B10 /* FavoritesStore.swift in Sources */,
 				24842144273FF92228540DBE /* FrequentEmojiStore.swift in Sources */,
+				109B63469DA494BD58E4538E /* FuzzyMatch.swift in Sources */,
 				1D0C2F452B3801503B70EA9E /* GeneralSettingsView.swift in Sources */,
 				AD2141EBF98A246BDA3BAB8E /* Gunzip.swift in Sources */,
 				DEC660F280699E43AA028E8A /* HotKeyCenter.swift in Sources */,

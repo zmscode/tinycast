@@ -12,8 +12,9 @@ builds with the **Xcode 26** toolchain.
 - **Channels:** Debug builds are their own channel — `Tinycast Dev.app` / `com.tinycast.app.dev` — so a
   local run never shares prefs, caches, TCC grants or login item with an installed stable/beta.
   Anything newly persisted must stay keyed by `Bundle.main.bundleIdentifier`.
-- **Tests:** no XCTest target — standalone `swiftc` harnesses in `Tools/` (see Critical Invariants and
-  `docs/development.md`).
+- **Tests:** no XCTest target — three standalone `swiftc` harnesses in `Tools/`, each compiling the
+  real engine sources (see Critical Invariants and `docs/development.md`). CI runs the build and all
+  three on every push / PR: `.github/workflows/ci.yml`.
 
 ## Project Philosophy
 
@@ -65,9 +66,9 @@ Never break these without an explicit task to do so.
   SwiftUI imports, no clock or network reads. `Tools/calc-test.swift` compiles the real engine
   sources. Both externally-sourced inputs are injected: the clock via `now`/`calendar`, the FX table
   via `rates` (`CurrencyRateStore` owns the fetch). Likewise `Core/Emoji/`
-  (`EmojiCatalog`, `EmojiGridGeometry`) stays AppKit/SwiftUI-free for `Tools/emoji-test.swift`.
-- **`Tools/fuzz-test.swift` holds a COPY of `FuzzyMatch`** from `Core/AppIndex.swift`. Change the
-  scoring in one, mirror it in the other, or the test is meaningless.
+  (`EmojiCatalog`, `EmojiGridGeometry`) stays AppKit/SwiftUI-free for `Tools/emoji-test.swift`, and
+  `Core/FuzzyMatch.swift` for `Tools/fuzz-test.swift`. Every harness compiles the real source — never
+  reintroduce a copy under `Tools/`.
 - **`EmojiData.generated.swift` is emitted by `node Tools/gen-emoji.js` and
   `CurrencyData.generated.swift` by `node Tools/gen-currencies.js`** — never edit either by hand.
   Currency names, signs and uncontested nouns are generated (Frankfurter × CLDR); the only
