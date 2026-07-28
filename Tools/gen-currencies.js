@@ -134,26 +134,26 @@ async function main() {
       `// Codes from ${CURRENCIES} (live as of ${latest}); names, signs and nouns from Unicode CLDR (en).\n` +
       "// Ambiguous signs and nouns are deliberately absent — CalcCurrency.swift decides those.\n" +
       "enum CurrencyData {\n" +
-      "    /// Every currency the rate feed still publishes, as (ISO 4217 code, display name).\n" +
-      "    static let all: [(code: String, name: String)] = [\n" +
-      rows.map(([c, n]) => `        (${swiftString(c)}, ${swiftString(n)}),`).join("\n") +
-      "\n    ]\n\n" +
-      "    /// Currency sign → ISO code, lowercased to match the tokenizer's ident form. Only signs CLDR\n" +
-      "    /// assigns to exactly one currency, so `$` is USD and `¥` is JPY without any guessing here.\n" +
-      "    static let signs: [Character: String] = [\n" +
+      "\t/// Every currency the rate feed still publishes, as (ISO 4217 code, display name).\n" +
+      "\tstatic let all: [(code: String, name: String)] = [\n" +
+      rows.map(([c, n]) => `\t\t(${swiftString(c)}, ${swiftString(n)}),`).join("\n") +
+      "\n\t]\n\n" +
+      "\t/// Currency sign → ISO code, lowercased to match the tokenizer's ident form. Only signs CLDR\n" +
+      "\t/// assigns to exactly one currency, so `$` is USD and `¥` is JPY without any guessing here.\n" +
+      "\tstatic let signs: [Character: String] = [\n" +
       [...signs]
         .sort((a, b) => a[1].localeCompare(b[1]))
-        .map(([s, c]) => `        ${swiftString(s)}: ${swiftString(c.toLowerCase())},`)
+        .map(([s, c]) => `\t\t${swiftString(s)}: ${swiftString(c.toLowerCase())},`)
         .join("\n") +
-      "\n    ]\n\n" +
-      "    /// Currency noun → ISO code, for nouns exactly one currency uses. Contested ones\n" +
-      "    /// (`dollars`, `pounds`, `francs`…) are absent by design; CalcCurrency assigns those.\n" +
-      "    static let aliases: [String: String] = [\n" +
+      "\n\t]\n\n" +
+      "\t/// Currency noun → ISO code, for nouns exactly one currency uses. Contested ones\n" +
+      "\t/// (`dollars`, `pounds`, `francs`…) are absent by design; CalcCurrency assigns those.\n" +
+      "\tstatic let aliases: [String: String] = [\n" +
       [...aliases]
         .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([w, c]) => `        ${swiftString(w)}: ${swiftString(c)},`)
+        .map(([w, c]) => `\t\t${swiftString(w)}: ${swiftString(c)},`)
         .join("\n") +
-      "\n    ]\n" +
+      "\n\t]\n" +
       "}\n",
   );
   console.log(
