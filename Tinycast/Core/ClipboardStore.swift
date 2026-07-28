@@ -157,8 +157,31 @@ final class ClipboardStore: ObservableObject {
 	}
 
 	func addText(_ text: String, sourceBundleID: String?) {
-		if items.first?.kind == .text, items.first?.text == text { return }
+		// Re-copying text already in history promotes the existing row instead of adding a second one, so repeated copies of the same snippet don't crowd the window. `promote` no-ops when it's already top, which preserves the old adjacent-duplicate behavior.
+		if let existing = findText(text) {
+			promote(
+				ClipboardItem(
+					id: existing.id, kind: .text, text: text, imagePath: nil,
+					createdAt: existing.createdAt, sourceBundleID: sourceBundleID))
+			return
+		}
 		insert(ClipboardItem(text: text, sourceBundleID: sourceBundleID))
+	}
+
+	/// Newest row whose text matches exactly: the in-memory window first, then SQLite so an entry older than `memoryWindow` still dedups rather than reappearing as a copy.
+	private func findText(_ text: String) -> ClipboardItem? {
+		if let item = items.first(where: { $0.kind == .text && $0.text == text }) { return item }
+		guard
+			let stmt = prepare(
+				"""
+				SELECT id, kind, text, image_path, created_at, source_app FROM items
+				WHERE kind = 'text' AND text = ? ORDER BY rowid DESC LIMIT 1
+				""")
+		else { return nil }
+		defer { sqlite3_finalize(stmt) }
+		sqlite3_bind_text(stmt, 1, text, -1, SQLITE_TRANSIENT)
+		guard sqlite3_step(stmt) == SQLITE_ROW else { return nil }
+		return Self.row(stmt)
 	}
 
 	func addImage(_ data: Data, sourceBundleID: String?) {
@@ -352,9 +375,8 @@ final class ClipboardStore: ObservableObject {
 				}
 			}
 		}
-		if items.last.map({ $0.createdAt < cutoff }) == true {
-			items.removeAll { $0.createdAt < cutoff }
-		}
+		// Unconditional: `items` is ordered by rowid, not `createdAt` — `importEntries` gives imported-but-old rows the highest rowids — so `items.last` isn't reliably the oldest and guarding on it would leave expired rows on screen until the next load. O(n) over a 1000-item cap on a path that already writes SQLite and deletes files.
+		items.removeAll { $0.createdAt < cutoff }
 	}
 
 	private func deleteBlob(_ item: ClipboardItem) {
