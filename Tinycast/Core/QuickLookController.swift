@@ -12,8 +12,12 @@ import QuickLookUI
 final class QuickLookController: NSObject, ObservableObject,
 	@preconcurrency QLPreviewPanelDataSource, @preconcurrency QLPreviewPanelDelegate
 {
-	/// True while the preview is on screen, so the palette can render its own state accordingly.
-	@Published private(set) var isPreviewing = false
+	/// Derived from the panel, never cached. A cached flag goes stale the moment the panel is closed
+	/// by any route we don't own (its close button, Esc, ⌘W) — and a stale `true` makes every
+	/// selection change re-open the preview, since `follow` treats it as "already showing".
+	var isPreviewing: Bool {
+		QLPreviewPanel.sharedPreviewPanelExists() && QLPreviewPanel.shared().isVisible
+	}
 
 	/// URLs currently previewable, in grid order, plus which one is showing. Kept in sync with the
 	/// selection so arrowing the grid moves the preview without reopening the panel.
@@ -39,7 +43,6 @@ final class QuickLookController: NSObject, ObservableObject,
 		panel.level = .floating + 1
 		panel.makeKeyAndOrderFront(nil)
 		panel.currentPreviewItemIndex = index
-		isPreviewing = true
 	}
 
 	/// Follow the grid selection only when a preview is already open — space toggles it on, arrows keep it in step.
@@ -53,12 +56,8 @@ final class QuickLookController: NSObject, ObservableObject,
 	}
 
 	func close() {
-		guard QLPreviewPanel.sharedPreviewPanelExists(), QLPreviewPanel.shared().isVisible else {
-			isPreviewing = false
-			return
-		}
+		guard isPreviewing else { return }
 		QLPreviewPanel.shared().orderOut(nil)
-		isPreviewing = false
 	}
 
 	// MARK: - QLPreviewPanelDataSource
@@ -84,9 +83,10 @@ final class QuickLookController: NSObject, ObservableObject,
 		}
 	}
 
-	func previewPanelDidClose(_ panel: QLPreviewPanel!) {
-		isPreviewing = false
-		// Hand the keyboard back to the palette rather than to whatever is behind it.
+	/// `QLPreviewPanelDelegate` refines `NSWindowDelegate`, so this is the genuine close callback —
+	/// there is no `previewPanelDidClose`. Hand the keyboard back to the palette rather than letting
+	/// it fall through to whatever is behind it.
+	func windowWillClose(_ notification: Notification) {
 		AppCore.shared.paletteKeyWindow?.makeKeyAndOrderFront(nil)
 	}
 }

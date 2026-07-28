@@ -55,7 +55,8 @@ struct EmojiTests {
 		expect(g.down(from: 16 + 0) == 16 + 8, "down within section 1 keeps the column")
 		expect(g.down(from: 16 + 9) == 26 + 1, "down from partial-row col 1 keeps the column")
 		expect(g.down(from: 28) == 28, "down from the last row is a no-op")
-		expect(g.up(from: 26) == 16 + 8, "up from section 2 col 0 lands on section 1 last row col 0")
+		expect(
+			g.up(from: 26) == 16 + 8, "up from section 2 col 0 lands on section 1 last row col 0")
 		expect(g.up(from: 28) == 16 + 9, "up from col 2 clamps into the shorter row above")
 		expect(g.up(from: 3) == 3, "up from the first row is a no-op")
 		expect(g.up(from: 16 + 2) == 10, "up from section 1 row 0 keeps the column into section 0")
