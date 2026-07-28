@@ -178,12 +178,7 @@ final class AppIndex: ObservableObject {
 		var seenBundleIDs = Set<String>()
 		var result: [AppEntry] = []
 		for dir in searchDirs {
-			guard
-				let items = try? fm.contentsOfDirectory(
-					at: dir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]
-				)
-			else { continue }
-			for url in items where url.pathExtension == "app" {
+			for url in appBundles(in: dir, fm: fm) {
 				let bundle = Bundle(url: url)
 				let bundleID = bundle?.bundleIdentifier
 				// Dedup by bundle id; first directory (/Applications) wins.
@@ -204,6 +199,32 @@ final class AppIndex: ObservableObject {
 			$0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
 		}
 		return apps + SettingsPaneScanner.scan() + CommandRegistry.all
+	}
+
+	/// `.app` bundles directly in `dir`, plus those one level inside a vendor folder (Adobe, Microsoft, Setapp…).
+	///
+	/// Deliberately no `.skipsHiddenFiles`: `/Applications/Safari.app` is a symlink into the Cryptex volume that the option filters out, so Safari never reached the index. Nothing is lost by dropping it — the `.app` extension check already excludes dotfiles.
+	nonisolated private static func appBundles(in dir: URL, fm: FileManager) -> [URL] {
+		guard
+			let items = try? fm.contentsOfDirectory(
+				at: dir, includingPropertiesForKeys: [.isDirectoryKey], options: [])
+		else { return [] }
+
+		var found: [URL] = []
+		for url in items {
+			if url.pathExtension == "app" {
+				found.append(url)
+				continue
+			}
+			// One level only, and never into a bundle's own Contents — an .app is handled above, so anything reached here is a plain folder.
+			guard !url.lastPathComponent.hasPrefix("."),
+				(try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true,
+				let nested = try? fm.contentsOfDirectory(
+					at: url, includingPropertiesForKeys: nil, options: [])
+			else { continue }
+			found.append(contentsOf: nested.filter { $0.pathExtension == "app" })
+		}
+		return found
 	}
 
 	/// Ranked matches. Empty query returns the full alphabetical list.
