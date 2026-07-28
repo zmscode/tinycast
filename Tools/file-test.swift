@@ -15,6 +15,7 @@ struct FileTests {
 		splitting()
 		expansion()
 		navigation()
+		spaceRule()
 		listing()
 
 		print(failures == 0 ? "\nALL PASSED" : "\n\(failures) FAILED")
@@ -71,6 +72,23 @@ struct FileTests {
 		check("bare home has no parent", FileBrowser.parent(of: "~") == nil)
 	}
 
+	/// Regression: Space previews only when no filter fragment is being typed.
+	///
+	/// The first cut guarded on `hasSuffix("/") || !query.isEmpty`, which is a tautology for any
+	/// path-shaped query — so the space bar could never type a character, and typing a directory
+	/// containing a space silently opened Quick Look instead.
+	static func spaceRule() {
+		func previewsOnSpace(_ query: String) -> Bool {
+			FileBrowser.split(query).fragment.isEmpty
+		}
+		for q in ["/Applications/", "~/Code/", "/", "~"] {
+			check("space previews at '\(q)' (no fragment)", previewsOnSpace(q))
+		}
+		for q in ["/Applications/Visual", "/Applications/Visual Studio", "~/Code/tin", "/App"] {
+			check("space types at '\(q)' (fragment in play)", !previewsOnSpace(q))
+		}
+	}
+
 	/// Listing against a real temp tree — the one part that must touch a filesystem.
 	static func listing() {
 		let fm = FileManager.default
@@ -91,7 +109,9 @@ struct FileTests {
 		check(
 			"folders sort before files",
 			names.prefix(2).sorted() == ["alpha", "zebra"], "got \(names)")
-		check("files follow, alphabetically", Array(names.dropFirst(2)) == ["beta.swift", "Calc.swift"], "got \(names)")
+		check(
+			"files follow, alphabetically",
+			Array(names.dropFirst(2)) == ["beta.swift", "Calc.swift"], "got \(names)")
 
 		let dotted = FileBrowser.entries(for: root.path + "/.", home: home).map(\.name)
 		check("a dot fragment reveals hidden entries", dotted.contains(".hidden"), "got \(dotted)")

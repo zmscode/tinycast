@@ -366,8 +366,9 @@ struct RootPaletteView: View {
 			guard browsingFiles, !menuOpen, !press.modifiers.contains(.command) else {
 				return .ignored
 			}
-			// Only when the caret is at the end of a path, so a space typed mid-filename still types.
-			guard vm.query.hasSuffix("/") || !vm.query.isEmpty else { return .ignored }
+			// Only with no filter fragment in play. Filenames contain spaces, and this is a real text
+			// field (unlike Finder's list), so mid-typing the space bar must type — ⌘Y always works.
+			guard FileBrowser.split(vm.query).fragment.isEmpty else { return .ignored }
 			core.toggleQuickLook(entries: fileEntries, index: selection)
 			return .handled
 		}

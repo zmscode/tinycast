@@ -46,7 +46,8 @@ struct FuzzTests {
 			ch.firstIndex(of: "Chess")! < ch.firstIndex(of: "Google Chrome")!, "got \(ch)")
 
 		check("'saf' top is Safari", rank("saf").first == "Safari", "got \(rank("saf"))")
-		check("'tm' includes Time Machine", rank("tm").contains("Time Machine"), "got \(rank("tm"))")
+		check(
+			"'tm' includes Time Machine", rank("tm").contains("Time Machine"), "got \(rank("tm"))")
 		check(
 			"'code' includes Visual Studio Code", rank("code").contains("Visual Studio Code"),
 			"got \(rank("code"))")
@@ -56,11 +57,16 @@ struct FuzzTests {
 		// fzf scores the matched region and ignores trailing text, so these tie on score; the
 		// shorter-name tiebreak in `rank` (and in AppIndex/EmojiIndex) is what separates them.
 		let safari = ["Safari", "Safari Technology Preview"]
-		let exact = safari.compactMap { n in FuzzyMatch.score(query: "safari", candidate: n).map { (n, $0) } }
-		check("exact and longer candidate tie on score", exact.count == 2 && exact[0].1 == exact[1].1,
+		let exact = safari.compactMap { n in
+			FuzzyMatch.score(query: "safari", candidate: n).map { (n, $0) }
+		}
+		check(
+			"exact and longer candidate tie on score", exact.count == 2 && exact[0].1 == exact[1].1,
 			"got \(exact)")
-		check("shorter name wins the tie once sorted",
-			exact.sorted { $0.1 != $1.1 ? $0.1 > $1.1 : $0.0.count < $1.0.count }.first?.0 == "Safari")
+		check(
+			"shorter name wins the tie once sorted",
+			exact.sorted { $0.1 != $1.1 ? $0.1 > $1.1 : $0.0.count < $1.0.count }.first?.0
+				== "Safari")
 		// A prefix must beat the same letters buried mid-word.
 		beats("scr", "Screenshot", "Discretion")
 	}
@@ -90,7 +96,9 @@ struct FuzzTests {
 		beats("cta", "Code/Tinycast/AppCore.swift", "contrast-alpha.txt")
 		// A path match should score well outright, not merely beat a strawman.
 		let m = FuzzyMatch.score(query: "coreapp", candidate: "~/Code/tinycast/Core/AppIndex.swift")
-		check("'coreapp' scores > 90 against a path", (m ?? 0) > 90, "got \(m.map(String.init) ?? "nil")")
+		check(
+			"'coreapp' scores > 90 against a path", (m ?? 0) > 90,
+			"got \(m.map(String.init) ?? "nil")")
 	}
 
 	/// Removing the consecutive-run bonus breaks these.
@@ -142,14 +150,20 @@ struct FuzzTests {
 		guard let e = FuzzyMatch.match(query: "safari", candidate: "Safari") else {
 			return check("'safari' matches Safari", false)
 		}
-		check("exact match covers every character", e.positions == [0, 1, 2, 3, 4, 5], "got \(e.positions)")
+		check(
+			"exact match covers every character", e.positions == [0, 1, 2, 3, 4, 5],
+			"got \(e.positions)")
 
 		// Positions must be strictly increasing and in range for any match.
-		for (q, c) in [("ci", "CalcIndex"), ("coreapp", "~/Code/Core/AppIndex.swift"), ("tm", "Time Machine")] {
+		for (q, c) in [
+			("ci", "CalcIndex"), ("coreapp", "~/Code/Core/AppIndex.swift"), ("tm", "Time Machine"),
+		] {
 			guard let m = FuzzyMatch.match(query: q, candidate: c) else {
-				check("\(q) matches \(c)", false); continue
+				check("\(q) matches \(c)", false)
+				continue
 			}
-			let ok = zip(m.positions, m.positions.dropFirst()).allSatisfy { $0 < $1 }
+			let ok =
+				zip(m.positions, m.positions.dropFirst()).allSatisfy { $0 < $1 }
 				&& m.positions.allSatisfy { $0 >= 0 && $0 < c.count }
 			check("positions strictly increasing and in range for '\(q)'", ok, "got \(m.positions)")
 		}
@@ -158,10 +172,18 @@ struct FuzzTests {
 	static func edgeCases() {
 		check("empty query scores 0", FuzzyMatch.score(query: "", candidate: "Safari") == 0)
 		check("empty candidate never matches", FuzzyMatch.score(query: "a", candidate: "") == nil)
-		check("query longer than candidate fails", FuzzyMatch.score(query: "safaris", candidate: "Safari") == nil)
-		check("case is ignored when matching", FuzzyMatch.score(query: "SAFARI", candidate: "safari") != nil)
-		check("unicode candidate is safe", FuzzyMatch.score(query: "cafe", candidate: "Café Münster") != nil)
-		check("emoji candidate is safe", FuzzyMatch.score(query: "sm", candidate: "😀 smiling face") != nil)
+		check(
+			"query longer than candidate fails",
+			FuzzyMatch.score(query: "safaris", candidate: "Safari") == nil)
+		check(
+			"case is ignored when matching",
+			FuzzyMatch.score(query: "SAFARI", candidate: "safari") != nil)
+		check(
+			"unicode candidate is safe",
+			FuzzyMatch.score(query: "cafe", candidate: "Café Münster") != nil)
+		check(
+			"emoji candidate is safe",
+			FuzzyMatch.score(query: "sm", candidate: "😀 smiling face") != nil)
 		check(
 			"repeated query characters need repeated candidate characters",
 			FuzzyMatch.score(query: "aaa", candidate: "banal") == nil)
@@ -181,7 +203,6 @@ struct FuzzTests {
 		return s
 	}
 
-
 	static func rank(_ query: String) -> [String] {
 		apps.compactMap { name -> (String, Int)? in
 			guard let s = FuzzyMatch.score(query: query, candidate: name) else { return nil }
@@ -196,9 +217,12 @@ struct FuzzTests {
 		let w = FuzzyMatch.score(query: query, candidate: winner)
 		let l = FuzzyMatch.score(query: query, candidate: loser)
 		guard let w else {
-			return check("'\(query)': \(winner) beats \(loser)", false, "winner did not match at all")
+			return check(
+				"'\(query)': \(winner) beats \(loser)", false, "winner did not match at all")
 		}
-		guard let l else { return check("'\(query)': \(winner) beats \(loser) (loser no match)", true) }
+		guard let l else {
+			return check("'\(query)': \(winner) beats \(loser) (loser no match)", true)
+		}
 		check("'\(query)': \(winner) [\(w)] beats \(loser) [\(l)]", w > l)
 	}
 
