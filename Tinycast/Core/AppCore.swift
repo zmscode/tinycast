@@ -98,6 +98,7 @@ final class AppCore: ObservableObject {
 	let visibility = VisibilityStore()
 	let calcHistory = CalculatorHistoryStore()
 	let currencyRates = CurrencyRateStore()
+	let cryptoRates = CryptoRateStore()
 	let emojiIndex = EmojiIndex()
 	let frequentEmoji = FrequentEmojiStore()
 	let runningApps = RunningAppsMonitor()
@@ -127,6 +128,7 @@ final class AppCore: ObservableObject {
 		Task { await appIndex.refresh() }
 		Task { await emojiIndex.load() }
 		currencyRates.start()
+		cryptoRates.start()
 
 		hotKeys.onTogglePalette = { [weak self] in self?.togglePalette() }
 		hotKeys.onToggleClipboard = { [weak self] in self?.toggleClipboard() }
@@ -186,6 +188,15 @@ final class AppCore: ObservableObject {
 		windowController.show()
 		// Re-scan on open so an app uninstalled since the last scan drops out of the launcher.
 		if palette.mode == .launcher { Task { await appIndex.refresh() } }
+	}
+
+	/// What the calculator is handed: the fiat table with coin rates folded in, each feed gated on
+	/// its own consent. Coins alone can't answer anything — every conversion crosses the shared base,
+	/// which comes from the fiat feed — so this stays `.off` until currency itself is enabled.
+	var calculatorCurrency: CurrencySource {
+		guard case .on(let fiat) = currencyRates.source else { return .off }
+		guard let fiat else { return .on(nil) }
+		return .on(fiat.merging(crypto: cryptoRates.available))
 	}
 
 	/// The palette panel, for the Quick Look controller to return focus to and forward keys into.

@@ -94,17 +94,18 @@ stay Foundation-only. Don't paste an engine into `Tools/` to make a harness buil
 stops testing the real code. The emoji harness pulls in `FuzzyMatch` because `EmojiIndex` searches
 with it.
 
-`.github/workflows/ci.yml` runs the Debug build and all three harnesses on every push and pull
+`.github/workflows/ci.yml` runs the Debug build and all four harnesses on every push and pull
 request, and is the source of truth for these commands.
 
 ## Generated data
 
-Two Swift files are emitted by scripts and must never be hand-edited. Both download their source, so
-run them online, then commit the result:
+Three Swift files are emitted by scripts and must never be hand-edited. All download their source,
+so run them online, then commit the result:
 
 ```sh
 node Tools/gen-emoji.js            # -> Tinycast/Core/Emoji/EmojiData.generated.swift
 node Tools/gen-currencies.js       # -> Tinycast/Core/Calculator/CurrencyData.generated.swift
+node Tools/gen-crypto.js           # -> Tinycast/Core/Calculator/CryptoData.generated.swift
 ```
 
 `gen-currencies.js` joins two sources on the ISO code: **Frankfurter**'s currency list (the same feed
@@ -117,6 +118,13 @@ Only unambiguous data is emitted. Anything two currencies claim — `dollars`, `
 left out and decided by hand in `CalcCurrency.contested`, the one currency table still written by
 hand. Re-run the script when a currency is added or retired; nothing breaks in the meantime, since
 an unquoted code just reports "no exchange rate".
+
+`gen-crypto.js` takes the top coins by market cap from **CoinGecko** — the same feed
+`CryptoRateStore` prices them from — skipping stablecoins, which track a fiat currency 1:1 and so
+add rounding rather than information. It reads the committed fiat tables and reserves any ticker
+fiat already claims: `sol` is the Peruvian sol, so Solana ships with its symbol reserved and
+resolves as `solana`. Fiat always wins a collision; picking the coin would be a product call, not a
+lookup.
 
 ## The fuzzy matcher
 

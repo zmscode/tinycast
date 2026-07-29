@@ -15,7 +15,8 @@ also **pure**: the one input it can't compute, the FX rate table, is passed in (
 3. Tokenize
 4. Base conversion
 5. Explicit unit conversion (`10km to mi`)
-6. **Currency conversion** (`1 euro to dollars`, `€20 to GBP`)
+6. **Currency conversion** (`1 euro to dollars`, `€20 to GBP`, and — with the second toggle on —
+   coins: `1 btc in usd`, `0.5 eth to eur`)
 7. **Bare-unit auto-conversion** (`1m` → feet + inches, `1hr` → 60 min, via
    `CalcUnits.parseBareConversion` + the `autoTargets` map)
 8. Plain arithmetic

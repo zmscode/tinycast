@@ -327,6 +327,8 @@ struct CalcTests {
 		expectDisplayWithoutConsent("255 to hex", "0xFF")
 		expectDisplayWithoutConsent("20% off 500", "400")
 
+		crypto()
+
 		print("\n\(passes) passed, \(failures) failed")
 		exit(failures == 0 ? 0 : 1)
 	}
@@ -356,8 +358,35 @@ struct CalcTests {
 		rates: [
 			"USD": 1, "EUR": 0.92, "GBP": 0.79, "JPY": 157, "INR": 83.5, "CAD": 1.36,
 			"KRW": 1330, "IDR": 18053, "CHF": 0.81, "AED": 3.6725,
+			// Coins, quoted like every other rate: units per 1 USD. BTC at $60,000, ETH at $3,000.
+			"BTC": 1.0 / 60_000, "ETH": 1.0 / 3_000, "SOL": 1.0 / 150,
 		],
 		fetchedAt: Date(timeIntervalSince1970: 1_785_000_000))
+
+	/// Coins ride the same rate table and conversion path as fiat; what differs is precision and
+	/// which idents resolve.
+	static func crypto() {
+		expectDisplay("1 btc in usd", "60,000.00 USD")
+		expectDisplay("2 btc to usd", "120,000.00 USD")
+		expectDisplay("1 eth in usd", "3,000.00 USD")
+		// By full name as well as ticker.
+		expectDisplay("1 bitcoin in usd", "60,000.00 USD")
+		expectDisplay("1 ethereum to usd", "3,000.00 USD")
+		// Cross-rates in both directions, and coin-to-coin.
+		expectDisplay("1 btc in eur", "55,200.00 EUR")
+		expectDisplay("1 eth in btc", "0.05 BTC")
+
+        // Precision: money's two decimals would render this "0.02" and throw away the answer.
+		expectDisplay("1500 usd in btc", "0.025 BTC")
+		expectDisplay("1 usd in btc", "0.00001667 BTC")
+
+		// `sol` belongs to the Peruvian sol, and fiat wins the ticker — Solana answers to its name.
+		expectDisplay("1 solana in usd", "150.00 USD")
+		expectError("1 sol in usd", "No exchange rate for PEN.")
+
+		// Without consent there is no card at all, coins included.
+		expectNilWithoutConsent("1 btc in usd")
+	}
 
 	// MARK: - Helpers
 
