@@ -98,7 +98,7 @@ struct KeyShortcut: Hashable, Sendable {
 	]
 
 	// `TISGetInputSourceProperty` is only safe on the main thread.
-	@MainActor private static func layoutCharacter(for keyCode: Int) -> String? {
+	@MainActor static func layoutCharacter(for keyCode: Int) -> String? {
 		guard
 			let source = TISCopyCurrentASCIICapableKeyboardLayoutInputSource()?
 				.takeRetainedValue(),

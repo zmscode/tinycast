@@ -103,6 +103,7 @@ final class AppCore: ObservableObject {
 	let frequentEmoji = FrequentEmojiStore()
 	let runningApps = RunningAppsMonitor()
 	let files = FileStore()
+	let folderPins = FolderPinsStore()
 	let quickLook = QuickLookController()
 	let palette = PaletteViewModel()
 
@@ -403,6 +404,52 @@ final class AppCore: ObservableObject {
 		quickLook.show(urls: entries.map { URL(fileURLWithPath: $0.path) }, index: index)
 	}
 
+	/// Move to Trash, never unlink: a palette is one keystroke from action, and Trash is the only
+	/// delete a user can undo. The confirmation follows `confirmQuitAll`'s shape — ↵ is Cancel, so a
+	/// reflexive second Return can't destroy anything.
+	func trashFile(_ entry: FileEntry) {
+		NSApp.activate(ignoringOtherApps: true)
+		let alert = NSAlert()
+		alert.messageText = String(localized: "Move \"\(entry.name)\" to Trash?")
+		alert.informativeText = String(localized: "You can put it back from the Trash.")
+		alert.alertStyle = .warning
+		let trash = alert.addButton(withTitle: String(localized: "Move to Trash"))
+		trash.hasDestructiveAction = true
+		alert.addButton(withTitle: String(localized: "Cancel")).keyEquivalent = "\r"
+		guard alert.runModal() == .alertFirstButtonReturn else { return }
+		try? FileManager.default.trashItem(
+			at: URL(fileURLWithPath: entry.path), resultingItemURL: nil)
+		files.invalidate()
+	}
+
+	/// Rename in place. Kept as a sheet-free `NSAlert` with an accessory field so it can't fight the
+	/// palette's first-responder rules the way an inline editor would.
+	func renameFile(_ entry: FileEntry) {
+		NSApp.activate(ignoringOtherApps: true)
+		let alert = NSAlert()
+		alert.messageText = String(localized: "Rename \"\(entry.name)\"")
+		alert.alertStyle = .informational
+		let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
+		field.stringValue = entry.name
+		alert.accessoryView = field
+		alert.addButton(withTitle: String(localized: "Rename"))
+		alert.addButton(withTitle: String(localized: "Cancel"))
+		alert.window.initialFirstResponder = field
+		guard alert.runModal() == .alertFirstButtonReturn else { return }
+		let name = field.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+		// A rename to nothing, to the same name, or across a directory boundary is a no-op.
+		guard !name.isEmpty, name != entry.name, !name.contains("/") else { return }
+		let source = URL(fileURLWithPath: entry.path)
+		try? FileManager.default.moveItem(
+			at: source, to: source.deletingLastPathComponent().appendingPathComponent(name))
+		files.invalidate()
+	}
+
+	func togglePin(_ entry: FileEntry) {
+		guard entry.isDirectory else { return }
+		folderPins.toggle(entry.path)
+	}
+
 	func revealFile(_ entry: FileEntry) {
 		hidePalette(restoreFocus: false)
 		AppLauncher.showInFinder(URL(fileURLWithPath: entry.path))
@@ -438,6 +485,13 @@ final class AppCore: ObservableObject {
 		if Paster.copy(item, store: clipboardStore) {
 			palette.selection = 0
 		}
+	}
+
+	/// Preview a copied image without leaving the palette. Text entries have their own preview pane
+	/// already, so only images reach here.
+	func quickLookClipboardImage(_ item: ClipboardItem) {
+		guard item.kind == .image, let url = clipboardStore.imageURL(for: item) else { return }
+		quickLook.show(urls: [url], index: 0)
 	}
 
 	func revealClipboardImage(_ item: ClipboardItem) {

@@ -27,31 +27,50 @@ final class FileStore: ObservableObject {
 @MainActor
 enum FileActionsMenu {
 	static func content(entry: FileEntry, core: AppCore) -> PopoverMenuContent {
-		PopoverMenuContent(
-			header: entry.name,
-			items: [
+		var items: [PopoverMenuItem] = [
+			PopoverMenuItem(
+				title: entry.isDirectory
+					? String(localized: "Open Folder") : String(localized: "Open"),
+				systemImage: entry.isDirectory ? "folder" : "arrow.up.forward.app",
+				shortcut: "↵"
+			) {
+				core.openFile(entry)
+			},
+			PopoverMenuItem(
+				title: String(localized: "Quick Look"), systemImage: "eye", shortcut: "Space"
+			) {
+				core.quickLookFromMenu(entry)
+			},
+			PopoverMenuItem(title: String(localized: "Show in Finder"), systemImage: "folder") {
+				core.revealFile(entry)
+			},
+			PopoverMenuItem(
+				title: String(localized: "Copy Path"), systemImage: "doc.on.doc", shortcut: "⌘↵"
+			) {
+				core.copyFilePath(entry)
+			},
+		]
+		if entry.isDirectory {
+			let pinned = core.folderPins.isPinned(entry.path)
+			items.append(
 				PopoverMenuItem(
-					title: entry.isDirectory
-						? String(localized: "Open Folder") : String(localized: "Open"),
-					systemImage: entry.isDirectory ? "folder" : "arrow.up.forward.app",
-					shortcut: "↵"
+					title: pinned
+						? String(localized: "Unpin Folder") : String(localized: "Pin Folder"),
+					systemImage: pinned ? "pin.slash" : "pin"
 				) {
-					core.openFile(entry)
-				},
-				PopoverMenuItem(
-					title: String(localized: "Quick Look"), systemImage: "eye", shortcut: "Space"
-				) {
-					core.quickLookFromMenu(entry)
-				},
-				PopoverMenuItem(title: String(localized: "Show in Finder"), systemImage: "folder") {
-					core.revealFile(entry)
-				},
-				PopoverMenuItem(
-					title: String(localized: "Copy Path"), systemImage: "doc.on.doc", shortcut: "⌘↵"
-				) {
-					core.copyFilePath(entry)
-				},
-			]
-		)
+					core.togglePin(entry)
+				})
+		}
+		items.append(
+			PopoverMenuItem(title: String(localized: "Rename…"), systemImage: "pencil") {
+				core.renameFile(entry)
+			})
+		items.append(
+			PopoverMenuItem(
+				title: String(localized: "Move to Trash"), systemImage: "trash", isDestructive: true
+			) {
+				core.trashFile(entry)
+			})
+		return PopoverMenuContent(header: entry.name, items: items)
 	}
 }

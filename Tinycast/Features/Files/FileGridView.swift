@@ -14,6 +14,8 @@ struct FileGridView: View {
 	/// row a new identity and the LazyVStack rebuilds at the top — no explicit scroll reset, which
 	/// would fight the header's safe-area inset and jam the first row underneath it.
 	let directoryKey: String
+	/// The trailing path fragment being typed — what the caption highlights.
+	let fragment: String
 	let onSelect: (Int) -> Void
 	let onActivate: () -> Void
 
@@ -38,8 +40,8 @@ struct FileGridView: View {
 				LazyVStack(spacing: 0) {
 					ForEach(rows) { row in
 						FileGridRowView(
-							row: row, selection: selection, onSelect: onSelect,
-							onActivate: onActivate
+							row: row, selection: selection, fragment: fragment,
+							onSelect: onSelect, onActivate: onActivate
 						)
 						.id(row.id)
 					}
@@ -70,6 +72,7 @@ private struct FileGridRow: Identifiable {
 private struct FileGridRowView: View {
 	let row: FileGridRow
 	let selection: Int
+	let fragment: String
 	let onSelect: (Int) -> Void
 	let onActivate: () -> Void
 
@@ -78,8 +81,16 @@ private struct FileGridRowView: View {
 			ForEach(0..<FileGrid.columns, id: \.self) { column in
 				if column < row.entries.count {
 					let index = row.start + column
-					FileCell(entry: row.entries[column], selected: index == selection)
+					FileCell(
+						entry: row.entries[column], selected: index == selection,
+						fragment: fragment)
 						.contentShape(Rectangle())
+						// Drag straight into Finder, a message, an upload field. The palette holds key
+						// focus for the whole drag, so its resign-key dismissal never fires mid-drag.
+						.draggable(URL(fileURLWithPath: row.entries[column].path)) {
+							FileIconView(path: row.entries[column].path)
+								.frame(width: Theme.Size.fileTileIcon, height: Theme.Size.fileTileIcon)
+						}
 						.onTapGesture { onSelect(index) }
 						.simultaneousGesture(
 							TapGesture(count: 2).onEnded {
@@ -99,6 +110,7 @@ private struct FileGridRowView: View {
 private struct FileCell: View {
 	let entry: FileEntry
 	let selected: Bool
+	let fragment: String
 	@State private var hovered = false
 
 	private var fill: Color {
@@ -111,7 +123,9 @@ private struct FileCell: View {
 		VStack(spacing: Theme.Spacing.sm) {
 			FileIconView(path: entry.path)
 				.frame(width: Theme.Size.fileTileIcon, height: Theme.Size.fileTileIcon)
-			Text(entry.displayName)
+			// Matched against the caption, not `name`: highlighting an extension that isn't drawn
+			// would put the emphasis on characters the user cannot see.
+			HighlightedText(text: entry.displayName, query: fragment)
 				.font(Theme.Typography.keyCap)
 				.lineLimit(2)
 				.multilineTextAlignment(.center)
@@ -137,7 +151,7 @@ private struct FileCell: View {
 
 /// File icon that decodes off the main thread, mirroring `AppIconView` — a directory listing can
 /// realize dozens of tiles at once and `NSWorkspace.icon(forFile:)` is not cheap.
-private struct FileIconView: View {
+struct FileIconView: View {
 	let path: String
 	@State private var image: NSImage?
 
