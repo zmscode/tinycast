@@ -103,12 +103,32 @@ enum Paster {
 		return true
 	}
 
+	/// The keycode that types "v" on the *current* layout, not the physical QWERTY V position.
+	///
+	/// A virtual keycode is a position, and the receiving app maps it through the active layout. On
+	/// a non-QWERTY layout `kVK_ANSI_V` therefore arrives as some other character entirely, so the
+	/// paste fires whatever *that* key is bound to — the reported symptom being a split pane opening
+	/// instead of text appearing. Resolved by asking the layout which key produces "v".
+	///
+	/// Recomputed per paste rather than cached: switching layout mid-session is exactly the case this
+	/// exists for, and a scan of 128 keycodes costs microseconds against a paste that already sleeps
+	/// 80ms for focus.
+	@MainActor
+	private static var pasteKeyCode: CGKeyCode {
+		for code in 0..<128 where KeyShortcut.layoutCharacter(for: code)?.lowercased() == "v" {
+			return CGKeyCode(code)
+		}
+		// No "v" in this layout (a non-Latin script): the QWERTY position is the best guess left,
+		// and matches how macOS itself keeps ⌘-shortcuts on the Latin positions.
+		return CGKeyCode(kVK_ANSI_V)
+	}
+
 	/// Synthesize ⌘V — delivered to `pid` alone when given, otherwise through the system tap to whatever is frontmost.
 	@MainActor
 	private static func postCommandV(toPid pid: pid_t? = nil) {
 		guard Permissions.ensureAccessibility() else { return }
 		let source = CGEventSource(stateID: .combinedSessionState)
-		let v = CGKeyCode(kVK_ANSI_V)
+		let v = pasteKeyCode
 		let down = CGEvent(keyboardEventSource: source, virtualKey: v, keyDown: true)
 		let up = CGEvent(keyboardEventSource: source, virtualKey: v, keyDown: false)
 		down?.flags = .maskCommand

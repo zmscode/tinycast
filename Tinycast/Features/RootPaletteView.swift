@@ -69,7 +69,17 @@ struct RootPaletteView: View {
 	}
 	private var fileEntries: [FileEntry] {
 		guard browsingFiles else { return [] }
+		// A bare `~` or `/` opens on pinned folders instead of the filesystem root: nobody browses
+		// from `/` on purpose, and an unfiltered home directory is mostly noise.
+		if showingPins { return core.folderPins.entries() }
 		return core.files.entries(for: vm.query)
+	}
+
+	/// True at a bare root with nothing typed after it — the only point where pins replace a listing.
+	private var showingPins: Bool {
+		guard browsingFiles else { return false }
+		let trimmed = vm.query.trimmingCharacters(in: .whitespaces)
+		return trimmed == "~" || trimmed == "/" || trimmed == "~/"
 	}
 
 	private var resultCount: Int {
@@ -364,6 +374,14 @@ struct RootPaletteView: View {
 		// Space previews the selected file; ⌘↑ goes up a directory. Both are file-grid only, so the
 		// space bar keeps typing normally everywhere else.
 		.onKeyPress(keys: [" "], phases: .down) { press in
+			// Clipboard mode: the search field is empty far more often than not, and an image row has
+			// no text to type into, so Space previews only while the filter is empty.
+			if vm.mode == .clipboard, !menuOpen, isQueryEmpty,
+				let clip = selectedClipItem, clip.kind == .image
+			{
+				core.quickLookClipboardImage(clip)
+				return .handled
+			}
 			guard browsingFiles, !menuOpen, !press.modifiers.contains(.command) else {
 				return .ignored
 			}
@@ -534,6 +552,7 @@ struct RootPaletteView: View {
 					entries: entries,
 					selection: selection,
 					directoryKey: FileBrowser.split(vm.query).directory,
+					fragment: FileBrowser.split(vm.query).fragment,
 					onSelect: { vm.selection = $0 },
 					onActivate: activateSelection
 				)
@@ -552,6 +571,7 @@ struct RootPaletteView: View {
 				favoriteCount: favoriteCount,
 				showSections: showSections,
 				scrollToken: scrollToken,
+				query: vm.query,
 				calc: calc,
 				calcSelected: calcSelected,
 				onActivateCalc: {
@@ -825,7 +845,12 @@ struct RootPaletteView: View {
 				guard let file = selectedFileEntry else { return }
 				// A folder descends in place (query becomes the new path); a file opens and dismisses.
 				if file.isDirectory {
-					vm.query = FileBrowser.descend(into: file, from: vm.query, home: core.files.home)
+					// A pin carries its own absolute path, so jump straight there rather than
+					// appending its name to the bare root the user typed.
+					vm.query =
+						showingPins
+						? file.path + "/"
+						: FileBrowser.descend(into: file, from: vm.query, home: core.files.home)
 					vm.selection = 0
 					scrollToken = UUID()
 				} else {

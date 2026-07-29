@@ -4,12 +4,21 @@ import Foundation
 
 enum RaycastImportError: LocalizedError {
 	case notRaycastFile
+	case unsupportedFormat(keys: [String])
 	case incorrectPassphrase
 	case corrupt
 
 	var errorDescription: String? {
 		switch self {
 		case .notRaycastFile: return "This doesn't look like a Raycast export (.rayconfig)."
+		// A file that unzips into a JSON envelope *is* a Raycast export — it just isn't the shape
+		// this importer knows. Saying "not a Raycast export" there sends people looking for the
+		// wrong problem, so name the real one.
+		case .unsupportedFormat(let keys):
+			let found = keys.isEmpty ? "none" : keys.sorted().joined(separator: ", ")
+			return
+				"This export uses a newer Raycast format that Tinycast can't read yet "
+				+ "(found: \(found)). Exports from Raycast 1.x are supported."
 		case .incorrectPassphrase: return "Incorrect passphrase, or the file is corrupted."
 		case .corrupt: return "The Raycast export could not be read."
 		}
@@ -103,15 +112,19 @@ enum RaycastImport {
 
 	static func decrypt(file: URL, passphrase: String) throws -> Data {
 		let raw = try Data(contentsOf: file)
+		// Split the two failures apart: unreadable-as-an-envelope really isn't a Raycast file, but a
+		// well-formed envelope missing the v1 encryption fields is a newer export we can't decrypt.
 		guard let envelopeData = try? Gunzip.decompress(raw),
-			let env = try? JSONSerialization.jsonObject(with: envelopeData) as? [String: Any],
-			let dataHex = env["data"] as? String,
+			let env = try? JSONSerialization.jsonObject(with: envelopeData) as? [String: Any]
+		else { throw RaycastImportError.notRaycastFile }
+
+		guard let dataHex = env["data"] as? String,
 			let enc = env["encryption"] as? [String: String],
 			let iv = enc["iv"].flatMap(Data.init(hex:)),
 			let salt = enc["salt"].flatMap(Data.init(hex:)),
 			let tag = enc["authTag"].flatMap(Data.init(hex:)),
 			let ciphertext = Data(hex: dataHex)
-		else { throw RaycastImportError.notRaycastFile }
+		else { throw RaycastImportError.unsupportedFormat(keys: Array(env.keys)) }
 
 		let key = Scrypt.derive(
 			passphrase: Array(passphrase.utf8), salt: [UInt8](salt), n: 16384, r: 8, p: 1, dkLen: 32)

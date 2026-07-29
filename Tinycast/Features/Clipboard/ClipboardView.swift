@@ -133,6 +133,12 @@ enum ClipboardActionsMenu {
 		]
 		if item.kind == .image {
 			items.append(
+				PopoverMenuItem(
+					title: String(localized: "Quick Look"), systemImage: "eye", shortcut: "Space"
+				) {
+					core.quickLookClipboardImage(item)
+				})
+			items.append(
 				PopoverMenuItem(title: String(localized: "Show in Finder"), systemImage: "folder") {
 					core.revealClipboardImage(item)
 				})

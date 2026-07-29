@@ -64,6 +64,33 @@ private enum CapsLockRemap {
 		apply(mappingOff)
 	}
 
+	/// Reapply only when the mapping has actually gone. hidutil state is per-device and does not
+	/// survive a keyboard being reconnected — or, on some hardware, a sleep/wake — and once it is
+	/// gone Caps Lock goes back to being Caps Lock while the tap sits waiting for an F18 that never
+	/// arrives. Checked rather than reasserted blindly so the common case spawns no process at all.
+	static func reassertIfLost() {
+		queue.async {
+			guard !isMapped() else { return }
+			apply(mappingOn)
+		}
+	}
+
+	/// True when Caps Lock is currently remapped to F18 (HID usage 0x70000006D).
+	private static func isMapped() -> Bool {
+		let process = Process()
+		process.executableURL = URL(fileURLWithPath: "/usr/bin/hidutil")
+		process.arguments = ["property", "--get", "UserKeyMapping"]
+		let pipe = Pipe()
+		process.standardOutput = pipe
+		process.standardError = FileHandle.nullDevice
+		guard (try? process.run()) != nil else { return true }
+		let data = pipe.fileHandleForReading.readDataToEndOfFile()
+		process.waitUntilExit()
+		let text = String(decoding: data, as: UTF8.self).lowercased()
+		// hidutil prints the destination in decimal (30064771181) or hex depending on version.
+		return text.contains("30064771181") || text.contains("0x70000006d")
+	}
+
 	private static func apply(_ mapping: String) {
 		let process = Process()
 		process.executableURL = URL(fileURLWithPath: "/usr/bin/hidutil")
@@ -119,6 +146,7 @@ final class HyperKeyTap: ObservableObject {
 	private var tapPort: CFMachPort?
 	private var runLoopSource: CFRunLoopSource?
 	private var healthTimer: Timer?
+	private var healthTicks = 0
 	private var cancellables: Set<AnyCancellable> = []
 	private var sessionTokens: [NotificationToken] = []
 	private var hidConnect: io_connect_t = IO_OBJECT_NULL
@@ -154,6 +182,15 @@ final class HyperKeyTap: ObservableObject {
 					queue: .main
 				) { [weak self] _ in
 					MainActor.assumeIsolated { self?.sessionDidResign() }
+				}, center: center),
+			NotificationToken(
+				center.addObserver(
+					forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+				) { [weak self] _ in
+					MainActor.assumeIsolated {
+						guard let self, self.key == .capsLock else { return }
+						CapsLockRemap.reassertIfLost()
+					}
 				}, center: center),
 			NotificationToken(
 				center.addObserver(
@@ -386,6 +423,11 @@ final class HyperKeyTap: ObservableObject {
 	/// One-second watchdog while a key is configured: retries installation until Accessibility is granted, notices revocation, revives a system-disabled tap, and clears a stuck hold.
 	private func healthCheck() {
 		guard key != .none else { return }
+		// Every 30th tick: a reconnected keyboard silently drops the remap and posts no notification,
+		// so this is the only thing that catches it. Reading hidutil spawns a process, hence 30s
+		// rather than every second.
+		healthTicks &+= 1
+		if key == .capsLock, healthTicks % 30 == 0 { CapsLockRemap.reassertIfLost() }
 		if tapPort == nil {
 			installTapIfNeeded()
 		} else if !Permissions.isAccessibilityTrusted() {
@@ -408,6 +450,7 @@ final class HyperKeyTap: ObservableObject {
 		} else {
 			installTapIfNeeded()
 		}
+		if key == .capsLock { CapsLockRemap.reassertIfLost() }
 	}
 
 	// MARK: - Synthetics & caps state

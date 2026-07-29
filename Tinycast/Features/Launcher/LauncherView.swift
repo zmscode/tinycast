@@ -7,6 +7,8 @@ struct LauncherList: View {
 	let showSections: Bool
 	/// Changes only when the list should scroll to follow the selection (keyboard nav / reset), so mouse selection never yanks the scroll position.
 	let scrollToken: UUID
+	/// Drives which characters each row emphasizes; empty means no highlight.
+	var query: String = ""
 	/// Inline calculator answer; occupies flat selection index 0 when present (requires a non-empty query, so it never coexists with the sectioned view).
 	var calc: CalcResult?
 	var calcSelected = false
@@ -77,6 +79,7 @@ struct LauncherList: View {
 										.padding(.bottom, Theme.Spacing.xs)
 								case .app(let app):
 									AppRow(
+										query: query,
 										app: app,
 										selected: app.id == selectedID,
 										running: runningApps.isRunning(app)
@@ -126,6 +129,7 @@ struct SectionHeader: View {
 }
 
 private struct AppRow: View {
+	let query: String
 	let app: AppEntry
 	let selected: Bool
 	let running: Bool
@@ -162,7 +166,7 @@ private struct AppRow: View {
 							.offset(y: 3)
 					}
 				}
-			Text(app.name)
+			HighlightedText(text: app.name, query: query)
 				.font(Theme.Typography.rowTitle)
 				.lineLimit(1)
 			if let caps = shortcutCaps {
