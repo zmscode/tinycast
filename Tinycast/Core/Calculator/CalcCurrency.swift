@@ -92,6 +92,10 @@ enum CalcCurrency {
 		}
 	}
 
+	/// Whether a resolved code is a coin rather than a fiat currency. Drives decimal precision:
+	/// two decimals is right for money and useless for something worth tens of thousands per unit.
+	static let cryptoCodes: Set<String> = Set(CryptoData.all.map(\.code))
+
 	/// Money is written sign-first (`€20`), so a leading currency ident followed by its amount is swapped back into the `amount currency …` order every parser here expects.
 	private static func amountFirst(_ tokens: [CalcToken]) -> [CalcToken] {
 		guard tokens.count >= 2, case .ident(let name) = tokens[0], byName[name] != nil,
@@ -137,6 +141,17 @@ enum CalcCurrency {
 		for (code, words) in contested {
 			guard let def = defs[code] else { continue }
 			for word in words { table[word] = def }
+		}
+		// Crypto last, and never over a fiat ident: a ticker fiat already owns is listed in
+		// `reservedSymbols` (today just `sol`, the Peruvian sol), so that coin resolves by name only.
+		for entry in CryptoData.all {
+			let def = CurrencyDef(code: entry.code, name: entry.name)
+			let ticker = entry.code.lowercased()
+			if !CryptoData.reservedSymbols.contains(ticker), table[ticker] == nil {
+				table[ticker] = def
+			}
+			let name = entry.name.lowercased()
+			if table[name] == nil { table[name] = def }
 		}
 		return table
 	}()

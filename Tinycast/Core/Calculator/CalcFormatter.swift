@@ -29,6 +29,20 @@ enum CalcFormatter {
 		return text
 	}
 
+	/// Coin rounding: up to 8 decimals (bitcoin's satoshi), trailing zeros trimmed. Money's
+	/// two-decimal rule would print 0.0446 BTC — about €2,500 — as "0.04", throwing away the part
+	/// the user actually asked for. Ungrouped, like `currency`; the display side wraps it.
+	static func crypto(_ value: Double) -> String {
+		let magnitude = abs(value)
+		guard magnitude >= 1e-9 else { return "0" }
+		// Large holdings don't need satoshi precision, and 8 decimals on 61,033 is just noise.
+		guard magnitude < 1 else { return String(format: "%.2f", value) }
+		var text = String(format: "%.8f", value)
+		while text.hasSuffix("0") { text.removeLast() }
+		if text.hasSuffix(".") { text.removeLast() }
+		return text
+	}
+
 	/// A length in feet rendered as whole feet + remaining inches ("3 feet 3.370078740 inches"); used only for the bare metric-length auto-conversion. Sub-foot values drop the feet part.
 	static func compoundFeetInches(_ feet: Double) -> String {
 		let sign = feet < 0 ? "-" : ""

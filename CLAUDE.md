@@ -12,9 +12,9 @@ builds with the **Xcode 26** toolchain.
 - **Channels:** Debug builds are their own channel — `Tinycast Dev.app` / `com.tinycast.app.dev` — so a
   local run never shares prefs, caches, TCC grants or login item with an installed stable/beta.
   Anything newly persisted must stay keyed by `Bundle.main.bundleIdentifier`.
-- **Tests:** no XCTest target — three standalone `swiftc` harnesses in `Tools/`, each compiling the
+- **Tests:** no XCTest target — four standalone `swiftc` harnesses in `Tools/`, each compiling the
   real engine sources (see Critical Invariants and `docs/development.md`). CI runs the build and all
-  three on every push / PR: `.github/workflows/ci.yml`.
+  four on every push / PR: `.github/workflows/ci.yml`.
 
 ## Project Philosophy
 
@@ -75,8 +75,11 @@ Never break these without an explicit task to do so.
   (`EmojiCatalog`, `EmojiGridGeometry`) stays AppKit/SwiftUI-free for `Tools/emoji-test.swift`, and
   `Core/FuzzyMatch.swift` for `Tools/fuzz-test.swift`. Every harness compiles the real source — never
   reintroduce a copy under `Tools/`.
-- **`EmojiData.generated.swift` is emitted by `node Tools/gen-emoji.js` and
-  `CurrencyData.generated.swift` by `node Tools/gen-currencies.js`** — never edit either by hand.
+- **`EmojiData.generated.swift` is emitted by `node Tools/gen-emoji.js`,
+  `CurrencyData.generated.swift` by `node Tools/gen-currencies.js`, and
+  `CryptoData.generated.swift` by `node Tools/gen-crypto.js`** — never edit any by hand.
+  `gen-crypto.js` reads the committed fiat tables and reserves any ticker fiat already owns
+  (`sol` is the Peruvian sol), so a coin can never shadow a currency.
   Currency names, signs and uncontested nouns are generated (Frankfurter × CLDR); the only
   hand-maintained currency data is `CalcCurrency.contested`, the nouns several currencies share
   (`dollars`, `pounds`). Don't add slang or synonyms there — no source of truth, so they rot.
@@ -90,7 +93,11 @@ Never break these without an explicit task to do so.
   `.off`, so forgetting to pass one disables the feature rather than enabling it. Fetch on a private
   **cacheless** `URLSession` (`.ephemeral`, `urlCache = nil`), never `URLSession.shared` — a cacheable
   response would leave a second copy in the on-disk `URLCache` that opting out doesn't delete.
-  `CurrencyRateStore` is the reference implementation — follow it rather than inventing a second shape.
+  `CurrencyRateStore` is the reference implementation — follow it rather than inventing a second
+  shape; `CryptoRateStore` is that pattern applied a second time. **One provider, one toggle:**
+  crypto is a separate store with its own consent key and its own dialog naming CoinGecko, because
+  agreeing to Frankfurter is not agreement to be talked about with a second service. Coins are
+  priced through the fiat base, so crypto stays inert until currency is on too.
 - **Swift 6 language mode: data-race violations are hard errors.** Almost everything is `@MainActor`;
   cross-actor model types are `Sendable`; heavy / IO work (app scan, image decode) is pushed off-main
   via `Task.detached` / `nonisolated`. Keep that boundary. House idioms: `NotificationToken` (RAII) for

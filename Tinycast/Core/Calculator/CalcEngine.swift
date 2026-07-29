@@ -90,7 +90,9 @@ enum CalcEngine {
 		if let conversion = CalcCurrency.parseConversion(tokens, source: currency) {
 			switch conversion {
 			case .value(let input, let from, let to, let output):
-				let amount = CalcFormatter.currency(output)
+				let amount =
+					CalcCurrency.cryptoCodes.contains(to.code)
+					? CalcFormatter.crypto(output) : CalcFormatter.currency(output)
 				return CalcResult(
 					expression: "\(CalcFormatter.display(input)) \(from.code)",
 					sourceBadge: from.name,

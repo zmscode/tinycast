@@ -11,6 +11,7 @@ struct RootPaletteView: View {
 	/// Observed so the inline card re-evaluates the moment a fresh FX snapshot lands, or the user
 	/// turns currency conversion on or off.
 	@EnvironmentObject private var currencyRates: CurrencyRateStore
+	@EnvironmentObject private var cryptoRates: CryptoRateStore
 	@EnvironmentObject private var emojiIndex: EmojiIndex
 	@EnvironmentObject private var frequentEmoji: FrequentEmojiStore
 	/// Observed so a skin tone changed in Settings re-renders the grid glyphs immediately.
@@ -58,7 +59,7 @@ struct RootPaletteView: View {
 	/// Inline calculator answer for the current query, live in both the launcher and Calculator History search; when present it occupies flat selection index 0 so rows shift by `calcCount`.
 	private var calcResult: CalcResult? {
 		vm.mode == .launcher || vm.mode == .calculatorHistory
-			? CalcMemo.evaluate(vm.query, currency: currencyRates.source) : nil
+			? CalcMemo.evaluate(vm.query, currency: core.calculatorCurrency) : nil
 	}
 	private var calcCount: Int { calcResult == nil ? 0 : 1 }
 
